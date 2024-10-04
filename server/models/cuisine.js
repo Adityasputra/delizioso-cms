@@ -14,10 +14,54 @@ module.exports = (sequelize, DataTypes) => {
   }
   Cuisine.init(
     {
-      name: DataTypes.STRING,
-      description: DataTypes.STRING,
-      price: DataTypes.INTEGER,
-      imgUrl: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Name Cuisine is required",
+          },
+          notNull: {
+            msg: "Name Cuisine is required",
+          },
+        },
+      },
+      description: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Description is required",
+          },
+          notNull: {
+            msg: "Description is required",
+          },
+        },
+      },
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Price is required",
+          },
+          notNull: {
+            msg: "Price is required",
+          },
+        },
+      },
+      imgUrl: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Image is required",
+          },
+          notNull: {
+            msg: "Image is required",
+          },
+        },
+      },
       CategoryId: DataTypes.INTEGER,
       UserId: DataTypes.INTEGER,
     },
