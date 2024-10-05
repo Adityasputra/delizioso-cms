@@ -2,6 +2,8 @@ const { comparePass } = require("../helpers/bcryptjsHelper");
 const { signInToken } = require("../helpers/jwtHelper");
 const { User } = require("../models");
 
+const cloudinary = require("cloudinary").v2;
+
 module.exports = class UserController {
   static async login(req, res, next) {
     try {
@@ -50,6 +52,45 @@ module.exports = class UserController {
   static async getUser(req, res, next) {
     try {
       res.status(200).json(req.user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateProfileUser(req, res, next) {
+    try {
+      const { id } = req.user;
+      const { username } = req.body;
+      let option = {};
+
+      if (username) {
+        option = { ...option, username: username };
+      }
+
+      if (req.file) {
+        cloudinary.config({
+          cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+          api_key: process.env.CLOUDINARY_API_KEY,
+          api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+
+        const b64File = Buffer.from(req.file.buffer).toString("base64");
+        const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
+
+        const uploadResult = await cloudinary.uploader.upload(dataURI, {
+          folder: "delizioso-profile",
+        });
+
+        option = { ...option, imageUrl: uploadResult.secure_url };
+      }
+
+      await User.update(option, {
+        where: { id },
+      });
+
+      res.status(200).json({
+        message: "Successfully to update Profile",
+      });
     } catch (error) {
       next(error);
     }
