@@ -23,6 +23,7 @@ const authentication = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error, "This Error Authentcation");
     next(error);
   }
 };
@@ -39,6 +40,17 @@ const authorization = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error, "This Error Authorization");
+    next(error);
+  }
+};
+
+const checkRoleUser = async (req, res, next) => {
+  try {
+    if (req.user.role !== "admin") throw { name: "Forbidden" };
+    next();
+  } catch (error) {
+    console.log(error, "This Error Check Role");
     next(error);
   }
 };
@@ -46,4 +58,5 @@ const authorization = async (req, res, next) => {
 module.exports = {
   authentication,
   authorization,
+  checkRoleUser,
 };

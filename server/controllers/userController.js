@@ -25,4 +25,25 @@ module.exports = class UserController {
       next(error);
     }
   }
+
+  static async addUser(req, res, next) {
+    try {
+      const { username, email, password } = req.body;
+      const newUser = await User.create({
+        username,
+        email,
+        password,
+      });
+
+      res.status(201).json({
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
 };

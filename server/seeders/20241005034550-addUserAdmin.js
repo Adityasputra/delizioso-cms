@@ -11,7 +11,7 @@ module.exports = {
         {
           username: "Admin",
           email: "admin@gmail.com",
-          password: hashPassword("admin123"),
+          password: hashPassword("admin123"), // Suggestions go to ENV
           role: "admin",
           createdAt: new Date(),
           updatedAt: new Date(),
