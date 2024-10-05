@@ -46,4 +46,12 @@ module.exports = class UserController {
       next(error);
     }
   }
+
+  static async getUser(req, res, next) {
+    try {
+      res.status(200).json(req.user);
+    } catch (error) {
+      next(error);
+    }
+  }
 };
