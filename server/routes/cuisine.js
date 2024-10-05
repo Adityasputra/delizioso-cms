@@ -1,9 +1,9 @@
-const router = require("express").Route();
+const router = require("express").Router();
 
 router.get("/", () => {});
 router.post("/", () => {});
 router.get("/:id/detail", () => {});
 router.put("/:id/edit", () => {});
-router.delete("/:id/remove");
+router.delete("/:id/remove", () => {});
 
 module.exports = router;
