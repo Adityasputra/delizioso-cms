@@ -27,6 +27,7 @@ module.exports = {
         type: Sequelize.ENUM({
           values: ["admin", "staff"],
         }),
+        defaultValue: "staff"
       },
       imageUrl: {
         type: Sequelize.STRING,
