@@ -1,5 +1,5 @@
 const { verifyToken } = require("../helpers/jwtHelper");
-const { User } = require("../models");
+const { User, Cuisine } = require("../models");
 
 const authentication = async (req, res, next) => {
   try {
@@ -28,10 +28,22 @@ const authentication = async (req, res, next) => {
 };
 
 const authorization = async (req, res, next) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
+  try {
+    const { CuisineId } = req.params;
 
+    const cuisine = await Cuisine.findByPk(CuisineId);
+    if (!cuisine) throw { name: "NotFound" };
+
+    if (req.user.role === "staff" && cuisine.authorId !== cuisine.UserId)
+      throw { name: "Forbidden" };
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  authentication,
+  authorization,
+};
