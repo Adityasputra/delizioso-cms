@@ -2,7 +2,7 @@ const { comparePass } = require("../helpers/bcryptjsHelper");
 const { signInToken } = require("../helpers/jwtHelper");
 const { User } = require("../models");
 
-const cloudinary = require("cloudinary").v2;
+const cloudinary = require("../config/cloudinary");
 
 module.exports = class UserController {
   static async login(req, res, next) {
@@ -68,12 +68,6 @@ module.exports = class UserController {
       }
 
       if (req.file) {
-        cloudinary.config({
-          cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-          api_key: process.env.CLOUDINARY_API_KEY,
-          api_secret: process.env.CLOUDINARY_API_SECRET,
-        });
-
         const b64File = Buffer.from(req.file.buffer).toString("base64");
         const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
 

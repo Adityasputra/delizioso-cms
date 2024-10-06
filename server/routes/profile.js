@@ -1,9 +1,6 @@
-const { getUser, updateProfileUser } = require("../controllers/userController");
-
 const router = require("express").Router();
-const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = require("../middlewares/multer");
+const { getUser, updateProfileUser } = require("../controllers/userController");
 
 router.get("/", getUser);
 router.put("/", upload.single("imageUrl"), updateProfileUser);
