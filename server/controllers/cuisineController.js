@@ -47,4 +47,14 @@ module.exports = class CuisineController {
       next(error);
     }
   }
+
+  static async getDetailCuisine(req, res, next) {
+    try {
+      const { id } = req.params;
+      const findCuisine = await Cuisine.findByPk(id);
+      res.status(200).json(findCuisine);
+    } catch (error) {
+      next(error);
+    }
+  }
 };
