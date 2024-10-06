@@ -87,7 +87,7 @@ module.exports = class CuisineController {
         option = { ...option, imgUrl: uploadResult.secure_url };
       }
 
-      const editCuisine = await Cuisine.update(option, {
+      await Cuisine.update(option, {
         where: {
           id,
         },
@@ -95,6 +95,18 @@ module.exports = class CuisineController {
 
       res.status(200).json({
         message: "Cuisine successfully updated",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async removeCuisine(req, res, next) {
+    try {
+      const { id } = req.params;
+      await Cuisine.destroy({ where: { id } });
+      res.status(200).json({
+        message: "Cuisine successfully deleted",
       });
     } catch (error) {
       next(error);
