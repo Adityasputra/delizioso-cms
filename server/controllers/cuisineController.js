@@ -57,4 +57,47 @@ module.exports = class CuisineController {
       next(error);
     }
   }
+
+  static async editCuisine(req, res, next) {
+    try {
+      const { name, description, price, CategoryId } = req.body;
+      const { id } = req.params;
+      let option = {};
+
+      if (name || description || price || CategoryId) {
+        option = {
+          ...option,
+          name,
+          description,
+          price,
+          CategoryId,
+          UserId: req.user.id,
+        };
+      }
+
+      if (req.file) {
+        const b64File = Buffer.from(req.file.buffer).toString("base64");
+        const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
+
+        const uploadResult = await cloudinary.uploader.upload(dataURI, {
+          folder: "delizioso-profile",
+          public_id: req.file.originalname.split(".")[0],
+        });
+
+        option = { ...option, imgUrl: uploadResult.secure_url };
+      }
+
+      const editCuisine = await Cuisine.update(option, {
+        where: {
+          id,
+        },
+      });
+
+      res.status(200).json({
+        message: "Cuisine successfully updated",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
