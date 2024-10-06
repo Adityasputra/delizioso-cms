@@ -38,4 +38,13 @@ module.exports = class CuisineController {
       next(error);
     }
   }
+
+  static async getAllCuisine(req, res, next) {
+    try {
+      const cuisines = await Cuisine.findAll();
+      res.status(200).json(cuisines);
+    } catch (error) {
+      next(error);
+    }
+  }
 };
