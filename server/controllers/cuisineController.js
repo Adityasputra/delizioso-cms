@@ -41,8 +41,43 @@ module.exports = class CuisineController {
 
   static async getAllCuisine(req, res, next) {
     try {
-      const cuisines = await Cuisine.findAll({ include: [User, Category] });
-      res.status(200).json(cuisines);
+      const { search, page } = req.query;
+      const paramsQuery = {
+        include: [User, Category], // Pastikan Anda ingin menyertakan User dan Category di sini
+      };
+
+      if (search) {
+        paramsQuery.where = {
+          name: {
+            [Op.iLike]: `%${search}%`, // Perbaikan di sini
+          },
+        };
+      }
+
+      let limit = 6;
+      let pageNumber = 1;
+
+      // Mengatur pagination
+      if (page) {
+        if (page.size) {
+          limit = +page.size;
+          paramsQuery.limit = limit;
+        }
+
+        if (page.number) {
+          pageNumber = +page.number;
+          paramsQuery.offset = limit * (pageNumber - 1);
+        }
+      }
+
+      const { count, rows } = await Cuisine.findAndCountAll(paramsQuery);
+      return res.json({
+        page: pageNumber,
+        data: rows,
+        totalData: count,
+        totalPage: Math.ceil(count / limit),
+        dataPerPage: limit,
+      });
     } catch (error) {
       next(error);
     }
