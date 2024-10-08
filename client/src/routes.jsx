@@ -1,6 +1,7 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainLayout from "./pages/MainLayout";
+import Dashboard from "./pages/Dashboard/DashboardPage";
 
 const router = createBrowserRouter([
   {
@@ -19,11 +20,11 @@ const router = createBrowserRouter([
       return null;
     },
     children: [
-        {
-            path: "",
-            element: <h1>Hello</h1>
-        }
-    ]
+      {
+        path: "",
+        element: <Dashboard />,
+      },
+    ],
   },
 ]);
 
