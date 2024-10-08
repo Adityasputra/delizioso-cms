@@ -52,7 +52,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-x-3 mt-4">
           <h2 className="text-2xl font-bold text-gray-800">Management Data</h2>
           <span className="px-3 py-1 text-xs text-[#B22222] bg-[#ffecbd] rounded-full">
-            {data.length + 1} users
+            {users.length} users
           </span>
         </div>
 
@@ -74,9 +74,9 @@ export default function Dashboard() {
 
                       <th
                         scope="col"
-                        className="px-12 py-3.5 text-sm font-semiBold text-[#B22222]"
+                        className="px-4 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-2">
+                        <div className="flex items-center justify-center gap-x-3">
                           <span>Price</span>
                         </div>
                       </th>
