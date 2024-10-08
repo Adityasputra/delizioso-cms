@@ -1,4 +1,4 @@
-const { Cuisine, Category } = require("../models");
+const { Cuisine, Category, User } = require("../models");
 const cloudinary = require("../config/cloudinary");
 
 module.exports = class CuisineController {
@@ -41,7 +41,7 @@ module.exports = class CuisineController {
 
   static async getAllCuisine(req, res, next) {
     try {
-      const cuisines = await Cuisine.findAll({ include: Category });
+      const cuisines = await Cuisine.findAll({ include: [User, Category] });
       res.status(200).json(cuisines);
     } catch (error) {
       next(error);
