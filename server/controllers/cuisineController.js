@@ -1,4 +1,4 @@
-const { Cuisine } = require("../models");
+const { Cuisine, Category, User } = require("../models");
 const cloudinary = require("../config/cloudinary");
 
 module.exports = class CuisineController {
@@ -41,8 +41,50 @@ module.exports = class CuisineController {
 
   static async getAllCuisine(req, res, next) {
     try {
-      const cuisines = await Cuisine.findAll();
-      res.status(200).json(cuisines);
+      const { search, page } = req.query;
+      const paramsQuery = {
+        include: [
+          {
+            model: User,
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+          Category,
+        ],
+      };
+
+      if (search) {
+        paramsQuery.where = {
+          name: {
+            [Op.iLike]: `%${search}%`,
+          },
+        };
+      }
+
+      let limit = 6;
+      let pageNumber = 1;
+
+      if (page) {
+        if (page.size) {
+          limit = +page.size;
+          paramsQuery.limit = limit;
+        }
+
+        if (page.number) {
+          pageNumber = +page.number;
+          paramsQuery.offset = limit * (pageNumber - 1);
+        }
+      }
+
+      const { count, rows } = await Cuisine.findAndCountAll(paramsQuery);
+      return res.json({
+        page: pageNumber,
+        data: rows,
+        totalData: count,
+        totalPage: Math.ceil(count / limit),
+        dataPerPage: limit,
+      });
     } catch (error) {
       next(error);
     }
