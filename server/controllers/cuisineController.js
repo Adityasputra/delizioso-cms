@@ -43,13 +43,13 @@ module.exports = class CuisineController {
     try {
       const { search, page } = req.query;
       const paramsQuery = {
-        include: [User, Category], // Pastikan Anda ingin menyertakan User dan Category di sini
+        include: [User, Category],
       };
 
       if (search) {
         paramsQuery.where = {
           name: {
-            [Op.iLike]: `%${search}%`, // Perbaikan di sini
+            [Op.iLike]: `%${search}%`,
           },
         };
       }
@@ -57,7 +57,6 @@ module.exports = class CuisineController {
       let limit = 6;
       let pageNumber = 1;
 
-      // Mengatur pagination
       if (page) {
         if (page.size) {
           limit = +page.size;

@@ -57,6 +57,15 @@ module.exports = class UserController {
     }
   }
 
+  static async getAllUsers(req, res, next) {
+    try {
+      const users = await User.findAll();
+      res.status(200).json(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async updateProfileUser(req, res, next) {
     try {
       const { id } = req.user;
