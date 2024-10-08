@@ -1,9 +1,11 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import MainLayout from "./pages/MainLayout";
 
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <h1>Login</h1>,
+    element: <LoginPage />,
     loader: () => {
       if (localStorage.access_token) return redirect("/");
       return null;
@@ -11,7 +13,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <hi>Hello</hi>,
+    element: <MainLayout />,
+    loader: () => {
+      if (!localStorage.access_token) return redirect("/login");
+      return null;
+    },
+    children: [
+        {
+            path: "",
+            element: <h1>Hello</h1>
+        }
+    ]
   },
 ]);
 
