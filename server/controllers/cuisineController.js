@@ -43,7 +43,15 @@ module.exports = class CuisineController {
     try {
       const { search, page } = req.query;
       const paramsQuery = {
-        include: [User, Category],
+        include: [
+          {
+            model: User,
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+          Category,
+        ],
       };
 
       if (search) {
