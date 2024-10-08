@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { formatDate } from "../../../helper/formatDateHelper";
 
 export default function TableCuisine({ data }) {
   const handleRemoveCuisine = async (id) => {
@@ -64,7 +65,7 @@ export default function TableCuisine({ data }) {
           </div>
         </td>
         <td className="px-4 py-4 text-sm text-gray-500  whitespace-nowrap">
-          {data.createdAt}
+          {formatDate(new Date(data.createdAt))}
         </td>
         <td className="px-4 py-4 text-sm whitespace-nowrap">
           <div className="flex items-center gap-x-6">
