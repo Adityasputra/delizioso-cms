@@ -62,8 +62,14 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
-      CategoryId: DataTypes.INTEGER,
-      UserId: DataTypes.INTEGER,
+      CategoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      UserId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       sequelize,
