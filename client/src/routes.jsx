@@ -2,6 +2,7 @@ import { createBrowserRouter, redirect } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainLayout from "./pages/MainLayout";
 import Dashboard from "./pages/Dashboard/DashboardPage";
+import AddCuisinePage from "./pages/Form/AddCuisinePage";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <Dashboard />,
+      },
+      {
+        path: "/add/cuisine",
+        element: <AddCuisinePage />,
       },
     ],
   },
