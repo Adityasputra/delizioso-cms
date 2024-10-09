@@ -67,8 +67,8 @@ export default function Dashboard() {
                         scope="col"
                         className="px-4 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-3">
-                          <span>Name</span>
+                        <div className="flex items-center justify-center">
+                          <span>Author</span>
                         </div>
                       </th>
 
@@ -76,7 +76,7 @@ export default function Dashboard() {
                         scope="col"
                         className="px-4 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-3">
+                        <div className="flex items-center justify-center">
                           <span>Price</span>
                         </div>
                       </th>
@@ -85,8 +85,8 @@ export default function Dashboard() {
                         scope="col"
                         className="px-4 py-3.5 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-2">
-                          <span>Cuisine</span>
+                        <div className="flex items-center justify-center ">
+                          <span>Name</span>
                         </div>
                       </th>
 
@@ -94,7 +94,7 @@ export default function Dashboard() {
                         scope="col"
                         className="px-4 py-3.5 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-2">
+                        <div className="flex items-center justify-center ">
                           <span>Description</span>
                         </div>
                       </th>
@@ -103,7 +103,7 @@ export default function Dashboard() {
                         scope="col"
                         className="px-4 py-3.5 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-2">
+                        <div className="flex items-center justify-center ">
                           <span>Categories</span>
                         </div>
                       </th>
@@ -112,7 +112,7 @@ export default function Dashboard() {
                         scope="col"
                         className="px-4 py-3.5 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-2">
+                        <div className="flex items-center justify-center ">
                           <span>CreatedAt</span>
                         </div>
                       </th>
@@ -121,8 +121,8 @@ export default function Dashboard() {
                         scope="col"
                         className="px-4 py-3.5 text-sm font-semiBold text-[#B22222]"
                       >
-                        <div className="flex items-center justify-center gap-x-2">
-                          <span>Action</span>
+                        <div className="flex items-center justify-center ">
+                          <span>Actions</span>
                         </div>
                       </th>
                     </tr>
@@ -130,7 +130,11 @@ export default function Dashboard() {
 
                   <tbody className="bg-white divide-y divide-gray-200">
                     {data.map((data) => (
-                      <TableCuisine key={data.id} data={data} />
+                      <TableCuisine
+                        key={data.id}
+                        data={data}
+                        onRemoveCuisine={setData}
+                      />
                     ))}
                   </tbody>
                 </table>
@@ -142,7 +146,7 @@ export default function Dashboard() {
         {/* <div className="flex items-center justify-between mt-6">
           <a
             href="#"
-            className="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100"
+            className="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md  hover:bg-gray-100"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

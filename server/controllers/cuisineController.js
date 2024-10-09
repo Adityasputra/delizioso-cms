@@ -34,8 +34,8 @@ module.exports = class CuisineController {
 
       res.status(201).json(newCuisine);
     } catch (error) {
-      console.log(error);
       next(error);
+      console.log(error, "this error controler");
     }
   }
 

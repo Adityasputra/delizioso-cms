@@ -9,7 +9,7 @@ function errorHandle(err, req, res, next) {
     case "SequelizeValidationError":
     case "SequelizeUniqueConstraintError":
       status = 400;
-      message = err.error.errors.map((er) => err.message);
+      message = err.errors.map((er) => er.message);
       break;
     case "Unauthenticated":
     case "JsonWebTokenError":
