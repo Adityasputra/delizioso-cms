@@ -1,6 +1,7 @@
 import axios from "../../services/axiosServices";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 
 export default function AddCuisinePage() {
   const [name, setName] = useState("");
@@ -39,8 +40,46 @@ export default function AddCuisinePage() {
         data: dataUploadImage,
       });
 
+      toast.success("Successfully added cuisine!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      
       navigate("/");
     } catch (error) {
+      if (error.response) {
+        const errorData = error.response.data.message;
+        // console.log(errorData, "This error data");
+        errorData.map((el) =>
+          toast.error(`${el}`, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          })
+        );
+      } else {
+        toast.error("Network error, please try again later!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+
       console.error(error);
     }
   };
@@ -162,7 +201,7 @@ export default function AddCuisinePage() {
           </div>
 
           <div className="flex justify-end mt-8">
-            <button className="px-6 py-3 text-white bg-[#8B4513] rounded-md hover:bg-[#B22222] focus:outline-none focus:bg-blue-500 transition-colors">
+            <button className="px-6 py-3 text-white bg-[#8B4513] rounded-md hover:bg-[#B22222] focus:outline-none transition-colors">
               Save
             </button>
           </div>

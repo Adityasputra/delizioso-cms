@@ -4,6 +4,7 @@ import MainLayout from "./pages/MainLayout";
 import Dashboard from "./pages/Dashboard/DashboardPage";
 import AddCuisinePage from "./pages/Form/AddCuisinePage";
 import AddStaffPage from "./pages/Form/AddStaffPage";
+import CategoryPage from "./pages/Category/CategoryPage";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/add/staff",
         element: <AddStaffPage />,
+      },
+      {
+        path: "/categories",
+        element: <CategoryPage />,
       },
     ],
   },

@@ -41,7 +41,6 @@ export default function AddStaffPage() {
 
       navigate("/");
     } catch (error) {
-      console.log(error);
       if (error.response) {
         const errorData = error.response.data.message;
         // console.log(errorData, "This error data");

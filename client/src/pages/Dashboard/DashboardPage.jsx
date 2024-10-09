@@ -68,7 +68,7 @@ export default function Dashboard() {
                         className="px-4 text-sm font-semiBold text-[#B22222]"
                       >
                         <div className="flex items-center justify-center">
-                          <span>Name</span>
+                          <span>Author</span>
                         </div>
                       </th>
 
@@ -86,7 +86,7 @@ export default function Dashboard() {
                         className="px-4 py-3.5 text-sm font-semiBold text-[#B22222]"
                       >
                         <div className="flex items-center justify-center ">
-                          <span>Cuisine</span>
+                          <span>Name</span>
                         </div>
                       </th>
 
@@ -122,7 +122,7 @@ export default function Dashboard() {
                         className="px-4 py-3.5 text-sm font-semiBold text-[#B22222]"
                       >
                         <div className="flex items-center justify-center ">
-                          <span>Action</span>
+                          <span>Actions</span>
                         </div>
                       </th>
                     </tr>
