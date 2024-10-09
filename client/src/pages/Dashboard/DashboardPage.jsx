@@ -130,7 +130,11 @@ export default function Dashboard() {
 
                   <tbody className="bg-white divide-y divide-gray-200">
                     {data.map((data) => (
-                      <TableCuisine key={data.id} data={data} />
+                      <TableCuisine
+                        key={data.id}
+                        data={data}
+                        onRemoveCuisine={setData}
+                      />
                     ))}
                   </tbody>
                 </table>

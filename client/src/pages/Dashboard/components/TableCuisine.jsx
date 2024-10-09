@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { formatDate } from "../../../helper/formatDateHelper";
 import { formatRupiah } from "../../../helper/rupiahFormatHelper";
+import { Bounce, toast } from "react-toastify";
+import axios from "../../../services/axiosServices";
 
-export default function TableCuisine({ data }) {
+export default function TableCuisine({ data, onRemoveCuisine }) {
   const handleRemoveCuisine = async (id) => {
     try {
       await axios({
@@ -12,7 +14,46 @@ export default function TableCuisine({ data }) {
           Authorization: `Bearer ${localStorage.access_token}`,
         },
       });
+
+      onRemoveCuisine((prevCuisine) =>
+        prevCuisine.filter((cuisine) => cuisine.id !== id)
+      );
+
+      toast.success("Successfully deleted cuisine!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     } catch (error) {
+      if (error.response) {
+        const errorData = error.response.data.message;
+        toast.error(`${errorData}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } else {
+        toast.error("Network error, please try again later!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+
       console.log(error);
     }
   };
