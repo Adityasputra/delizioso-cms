@@ -3,6 +3,7 @@ import LoginPage from "./pages/LoginPage";
 import MainLayout from "./pages/MainLayout";
 import Dashboard from "./pages/Dashboard/DashboardPage";
 import AddCuisinePage from "./pages/Form/AddCuisinePage";
+import AddStaffPage from "./pages/Form/AddStaffPage";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/add/cuisine",
         element: <AddCuisinePage />,
+      },
+      {
+        path: "/add/staff",
+        element: <AddStaffPage />,
       },
     ],
   },
