@@ -132,7 +132,10 @@ export default function TableCuisine({ data, onRemoveCuisine }) {
                 />
               </svg>
             </button>
-            <Link className="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none">
+            <Link
+              className="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
+              to={`/cuisine/${data.id}/detail`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -148,7 +151,10 @@ export default function TableCuisine({ data, onRemoveCuisine }) {
                 />
               </svg>
             </Link>
-            <Link className="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none">
+            <Link
+              className="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
+              to={`/cuisine/${data.id}/detail`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

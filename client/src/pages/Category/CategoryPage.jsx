@@ -35,7 +35,6 @@ export default function CategoryPage() {
         transition: Bounce,
       });
 
-      // Reset name input setelah berhasil menambahkan
       setName("");
     } catch (error) {
       if (error.response) {

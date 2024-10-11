@@ -31,10 +31,11 @@ export default function LoginPage() {
       <div className="min-h-screen bg-[#DAA520] flex items-center justify-center">
         <div className="flex bg-white shadow-sm rounded-lg overflow-hidden max-w-sm lg:max-w-4xl w-full">
           <div
-            className="hidden lg:block lg:w-1/2 bg-cover"
+            className="hidden lg:block lg:w-1/2 bg-cover backgroud"
             style={{
-              backgroundImage:
-                'url("https://images.unsplash.com/photo-1593548615309-5a45c504f994?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+              backgroundImage: "url(./loginBG.jpg)",
+              backgroundPositionX: "center",
+              backgroundPositionY: "70%"
             }}
           ></div>
           <div className="w-full p-8 lg:w-1/2">

@@ -56,7 +56,6 @@ export default function AddCuisinePage() {
     } catch (error) {
       if (error.response) {
         const errorData = error.response.data.message;
-        // console.log(errorData, "This error data");
         errorData.map((el) =>
           toast.error(`${el}`, {
             position: "top-right",
