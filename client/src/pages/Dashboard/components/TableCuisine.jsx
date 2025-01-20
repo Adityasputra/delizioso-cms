@@ -134,7 +134,7 @@ export default function TableCuisine({ data, onRemoveCuisine }) {
             </button>
             <Link
               className="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
-              to={`/cuisine/${data.id}/detail`}
+              to={`/cuisine/${data.id}/edit`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

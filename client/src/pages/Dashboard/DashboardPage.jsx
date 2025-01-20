@@ -50,7 +50,7 @@ export default function Dashboard() {
     <>
       <section className="container px-4 mx-auto">
         <div className="flex items-center gap-x-3 mt-4">
-          <h2 className="text-2xl font-bold text-gray-800">Management Data</h2>
+          <h2 className="text-2xl font-[] font-bold text-gray-800">Management Data</h2>
           <span className="px-3 py-1 text-xs text-[#B22222] bg-[#ffecbd] rounded-full">
             {users.length} users
           </span>

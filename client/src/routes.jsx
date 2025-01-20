@@ -6,6 +6,7 @@ import AddCuisinePage from "./pages/Form/AddCuisinePage";
 import AddStaffPage from "./pages/Form/AddStaffPage";
 import CategoryPage from "./pages/Category/CategoryPage";
 import CuisineDetailPage from "./pages/Cuisine/CuisineDetailPage";
+import EditCuisinePage from "./pages/Form/EditCuisinePage";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "/categories",
         element: <CategoryPage />,
+      },
+      {
+        path: "/cuisine/:id/edit",
+        element: <EditCuisinePage />,
       },
       {
         path: "/cuisine/:id/detail",

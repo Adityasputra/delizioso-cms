@@ -250,7 +250,6 @@ export default function Sidebar() {
                 onClick={handleLogout}
                 className="flex items-center text-gray-500 transition-colors duration-200 hover:text-[#B22222]"
               >
-              
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -275,49 +274,33 @@ export default function Sidebar() {
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        contentLabel="Modal Upload Image Profile"
+        className="bg-white p-6 rounded-lg max-w-sm mx-auto mt-20 shadow-lg outline-none"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
       >
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-          <form
-            className="relative bg-white p-6 rounded-lg shadow-md w-96"
-            onSubmit={handleUpdateImageProfile}
-          >
+        <h2 className="text-lg font-semibold mb-4">Update Profile Picture</h2>
+        <form onSubmit={handleUpdateImageProfile}>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 mb-4"
+          />
+          <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
+              className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300"
             >
-              ✕
+              Cancel
             </button>
-
-            <h2 className="text-2xl font-bold text-center mb-4">
-              Upload Image
-            </h2>
-
-            <input
-              type="file"
-              id="file"
-              name="file" 
-              onChange={handleFileChange}
-              accept="image/*"
-              className="block w-full text-sm text-gray-500 
-             file:mr-4 file:py-2 file:px-4
-             file:rounded-md file:border-0 
-             file:text-sm file:font-semibold
-             file:bg-blue-50 file:text-[#8B4513]
-             hover:file:bg-blue-100"
-            />
-
             <button
               type="submit"
-              className="mt-4 w-full bg-[#8B4513] text-white py-2 rounded-md 
-             hover:bg-[#B22222] focus:outline-none focus:ring-2 
-             focus:ring-blue-500 focus:ring-opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-[#DAA520] rounded-lg hover:bg-[#B8860B]"
             >
-              Upload
+              Save
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </Modal>
     </>
   );

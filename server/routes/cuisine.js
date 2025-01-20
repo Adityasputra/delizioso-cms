@@ -7,11 +7,12 @@ const {
   editCuisine,
   removeCuisine,
 } = require("../controllers/cuisineController");
+const { authorization } = require("../middlewares/auth");
 
 router.post("/", upload.single("imgUrl"), addCuisine);
 router.get("/", getAllCuisine);
 router.get("/:id/detail", getDetailCuisine);
-router.put("/:id/edit", upload.single("imgUrl"), editCuisine);
-router.delete("/:id/remove", removeCuisine);
+router.put("/:id/edit", authorization, upload.single("imgUrl"), editCuisine);
+router.delete("/:id/remove", authorization, removeCuisine);
 
 module.exports = router;

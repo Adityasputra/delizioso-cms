@@ -30,12 +30,12 @@ const authentication = async (req, res, next) => {
 
 const authorization = async (req, res, next) => {
   try {
-    const { CuisineId } = req.params;
+    const { id } = req.params;
 
-    const cuisine = await Cuisine.findByPk(CuisineId);
+    const cuisine = await Cuisine.findByPk(id);
     if (!cuisine) throw { name: "NotFound" };
 
-    if (req.user.role === "staff" && cuisine.authorId !== cuisine.UserId)
+    if (req.user.role === "staff" && req.user.id !== cuisine.UserId)
       throw { name: "Forbidden" };
 
     next();
