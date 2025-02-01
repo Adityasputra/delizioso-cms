@@ -10,7 +10,7 @@ export default function Button({
       onClick={onClick}
       type={type}
       disabled={disabled}
-      className={`px-4 py-2 font-semibold transition-all duration-200 
+      className={`px-4 py-2 font-semibold transition-all rounded-md duration-200 
           focus:outline-none focus:ring-2 focus:ring-foreground 
           ${
             disabled

@@ -1,5 +1,5 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
-import LoginPage from "./pages/LoginPage1";
+import LoginPage from "./pages/LoginPage";
 import MainLayout from "./pages/MainLayout";
 import Dashboard from "./pages/Dashboard/DashboardPage";
 import AddCuisinePage from "./pages/Form/AddCuisinePage";
