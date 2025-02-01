@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         vibes: ["Great Vibes", "cursive"],
+        playfair: ["Playfair Display", "serif"],
       },
     },
   },

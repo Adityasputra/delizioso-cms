@@ -35,7 +35,7 @@ export default function LoginPage() {
             style={{
               backgroundImage: "url(./loginBG.jpg)",
               backgroundPositionX: "center",
-              backgroundPositionY: "70%"
+              backgroundPositionY: "70%",
             }}
           ></div>
           <div className="w-full p-8 lg:w-1/2">

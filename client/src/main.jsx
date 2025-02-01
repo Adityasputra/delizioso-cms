@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource/great-vibes";
+import "@fontsource/playfair-display";
 import "./index.css";
 
 import { RouterProvider } from "react-router-dom";
