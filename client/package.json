@@ -13,6 +13,7 @@
     "@fontsource/great-vibes": "^5.1.0",
     "@fontsource/playfair-display": "^5.1.1",
     "axios": "^1.7.7",
+    "lucide-react": "^0.474.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-modal": "^3.16.1",

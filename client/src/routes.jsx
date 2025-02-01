@@ -1,28 +1,24 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
+import { lazy, Suspense } from "react";
 import MainLayout from "./pages/MainLayout";
-import Dashboard from "./pages/Dashboard/DashboardPage";
-import AddCuisinePage from "./pages/Form/AddCuisinePage";
-import AddStaffPage from "./pages/Form/AddStaffPage";
-import CategoryPage from "./pages/Category/CategoryPage";
-import CuisineDetailPage from "./pages/Cuisine/CuisineDetailPage";
-import EditCuisinePage from "./pages/Form/EditCuisinePage";
-import MobileWarning from "./pages/MobileWarning";
+import LoginPage from "./pages/LoginPage";
 
-const checkAuth = () => {
-  const token = localStorage.getItem("access_token");
-  return token ? null : redirect("/login");
+const Dashboard = lazy(() => import("./pages/Dashboard/DashboardPage"));
+const AddCuisinePage = lazy(() => import("./pages/Form/AddCuisinePage"));
+const AddStaffPage = lazy(() => import("./pages/Form/AddStaffPage"));
+const CategoryPage = lazy(() => import("./pages/Category/CategoryPage"));
+const CuisineDetailPage = lazy(() =>
+  import("./pages/Cuisine/CuisineDetailPage")
+);
+const EditCuisinePage = lazy(() => import("./pages/Form/EditCuisinePage"));
+
+const requireAuth = () => {
+  if (!localStorage.access_token) return redirect("/login");
+  return null;
 };
 
-const checkAlreadyLoggedIn = () => {
-  const token = localStorage.getItem("access_token");
-  return token ? redirect("/") : null;
-};
-
-const checkMobile = () => {
-  if (window.innerWidth < 768) {
-    return redirect("/mobile-warning");
-  }
+const checkLogin = () => {
+  if (localStorage.access_token) return redirect("/");
   return null;
 };
 
@@ -30,27 +26,62 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
-    loader: checkAlreadyLoggedIn,
+    loader: checkLogin,
   },
   {
     path: "/",
     element: <MainLayout />,
-    loader: async () => {
-      await checkAuth();
-      return checkMobile();
-    },
+    loader: requireAuth,
     children: [
-      { path: "", element: <Dashboard /> },
-      { path: "add/cuisine", element: <AddCuisinePage /> },
-      { path: "add/staff", element: <AddStaffPage /> },
-      { path: "categories", element: <CategoryPage /> },
-      { path: "cuisine/:id/edit", element: <EditCuisinePage /> },
-      { path: "cuisine/:id/detail", element: <CuisineDetailPage /> },
+      {
+        path: "",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <Dashboard />
+          </Suspense>
+        ),
+      },
+      {
+        path: "add/cuisine",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <AddCuisinePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "add/staff",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <AddStaffPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "categories",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <CategoryPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "cuisine/:id/edit",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <EditCuisinePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "cuisine/:id/detail",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <CuisineDetailPage />
+          </Suspense>
+        ),
+      },
     ],
-  },
-  {
-    path: "/mobile-warning",
-    element: <MobileWarning />,
   },
 ]);
 
