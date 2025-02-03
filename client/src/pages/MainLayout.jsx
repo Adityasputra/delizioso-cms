@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Outlet } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
+// import Sidebar from "../components/Sidebar";
 import WarningDesktopOnly from "../components/WarningDesktopOnly";
+import Sidebar from "../components/SidebarComponent";
 
 export default function MainLayout() {
   const isDesktopInitial = useMemo(() => window.innerWidth >= 1024, []);
@@ -20,11 +21,12 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen flex bg-gray-100 overflow-hidden">
-      <aside className="hidden lg:block w-64 bg-white shadow-md h-full">
-        <Sidebar />
-      </aside>
+      {/* <aside className="hidden lg:block w-64 bg-white shadow-md h-full">
+        // <Sidebar />
+      </aside> */}
 
-      <main className="flex-1">
+      <Sidebar />
+      <main className="flex-1 p-4">
         <Outlet />
       </main>
     </div>
