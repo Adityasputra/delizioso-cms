@@ -1,2 +1,2 @@
 #FFFCF9 => Background
-##181818 => foreground
+#181818 => foreground

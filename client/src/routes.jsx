@@ -3,7 +3,7 @@ import { lazy, Suspense } from "react";
 import MainLayout from "./pages/MainLayout";
 import LoginPage from "./pages/LoginPage";
 
-const Dashboard = lazy(() => import("./pages/Dashboard/DashboardPage"));
+const Dashboard = lazy(() => import("./pages/DashboardPage"));
 const AddCuisinePage = lazy(() => import("./pages/Form/AddCuisinePage"));
 const AddStaffPage = lazy(() => import("./pages/Form/AddStaffPage"));
 const CategoryPage = lazy(() => import("./pages/Category/CategoryPage"));
