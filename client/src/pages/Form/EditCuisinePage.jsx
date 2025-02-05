@@ -1,9 +1,9 @@
 import axios from "../../services/axiosServices";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Bounce, toast } from "react-toastify";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast, Bounce } from "react-toastify";
 
-export default function AddCuisinePage() {
+export default function EditCuisinePage() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -12,12 +12,13 @@ export default function AddCuisinePage() {
   const [categories, setCategories] = useState([]);
 
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  const handleAddCuisine = async (e) => {
+  const handleEditCuisine = async (e) => {
     e.preventDefault();
 
     try {
@@ -31,8 +32,8 @@ export default function AddCuisinePage() {
       }
 
       await axios({
-        method: "POST",
-        url: "/cuisines",
+        method: "PUT",
+        url: `/cuisines/${id}/edit`,
         headers: {
           Authorization: `Bearer ${localStorage.access_token}`,
           "Content-Type": "multipart/form-data",
@@ -40,7 +41,7 @@ export default function AddCuisinePage() {
         data: dataUploadImage,
       });
 
-      toast.success("Successfully added cuisine!", {
+      toast.success("Successfully updated cuisine!", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -54,32 +55,17 @@ export default function AddCuisinePage() {
 
       navigate("/");
     } catch (error) {
-      if (error.response) {
-        const errorData = error.response.data.message;
-        errorData.map((el) =>
-          toast.error(`${el}`, {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          })
-        );
-      } else {
-        toast.error("Network error, please try again later!", {
+      const errorData = error.response?.data.message || [];
+      errorData.forEach((msg) =>
+        toast.error(`${msg}`, {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
-        });
-      }
-
-      console.error(error);
+        })
+      );
     }
   };
 
@@ -100,16 +86,37 @@ export default function AddCuisinePage() {
       }
     };
 
+    const fetchDataCuisineById = async () => {
+      try {
+        const { data } = await axios({
+          method: "GET",
+          url: `/cuisines/${id}/detail`,
+          headers: {
+            Authorization: `Bearer ${localStorage.access_token}`,
+          },
+        });
+
+        setName(data.name);
+        setPrice(data.price);
+        setDescription(data.description);
+        setCategory(data.CategoryId);
+        setFile(data.imgUrl);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     fetchCategories();
-  }, []);
+    fetchDataCuisineById();
+  }, [id]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <section className="max-w-4xl w-full p-8 mx-auto bg-white rounded-lg shadow-md">
         <h2 className="text-3xl font-semibold text-center text-[#B22222] mb-8 capitalize">
-          Add Cuisine
+          Edit Cuisine
         </h2>
-        <form onSubmit={handleAddCuisine}>
+        <form onSubmit={handleEditCuisine}>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label className="text-gray-700 font-medium" htmlFor="name">
@@ -147,6 +154,13 @@ export default function AddCuisinePage() {
               >
                 Upload Image
               </label>
+              {/* {file && typeof file === "string" && (
+                    <img
+                    src={file}
+                    alt="cuisine"
+                    className="w-32 h-32 object-cover mb-2"
+                    />
+                )} */}
               <input
                 id="imageUpload"
                 type="file"
@@ -154,11 +168,11 @@ export default function AddCuisinePage() {
                 onChange={handleFileChange}
                 accept="image/*"
                 className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-[#8B4513]
-                hover:file:bg-blue-100 transition-colors"
+      file:mr-4 file:py-2 file:px-4
+      file:rounded-md file:border-0
+      file:text-sm file:font-semibold
+      file:bg-blue-50 file:text-[#8B4513]
+      hover:file:bg-blue-100 transition-colors"
               />
             </div>
 
@@ -199,7 +213,13 @@ export default function AddCuisinePage() {
             </div>
           </div>
 
-          <div className="flex justify-end mt-8">
+          <div className="flex justify-end gap-2 mt-8">
+            <button
+              className="px-6 py-3 text-white bg-[#8B4513] rounded-md hover:bg-[#B22222] focus:outline-none transition-colors"
+              onClick={() => navigate("/")}
+            >
+              Back
+            </button>
             <button className="px-6 py-3 text-white bg-[#8B4513] rounded-md hover:bg-[#B22222] focus:outline-none transition-colors">
               Save
             </button>

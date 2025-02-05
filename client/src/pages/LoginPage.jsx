@@ -1,94 +1,91 @@
 import axios from "../services/axiosServices";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Button from "../components/ui/Button";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    try {
-      e.preventDefault();
-      const { data } = await axios({
-        method: "POST",
-        url: "/users/login",
-        data: {
-          email,
-          password,
-        },
-      });
+    e.preventDefault();
+    setLoading(true);
 
+    try {
+      const { data } = await axios.post("/users/login", { email, password });
       localStorage.setItem("access_token", data.access_token);
-      navigate("/");
-    } catch (error) {
-      console.log(error);
+      toast.success("Login successful!", { autoClose: 2000 });
+      setTimeout(() => navigate("/"), 2000);
+    } catch (err) {
+      toast.error("Invalid email or password", { autoClose: 3000 });
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
-    <>
-      <div className="min-h-screen bg-[#DAA520] flex items-center justify-center">
-        <div className="flex bg-white shadow-sm rounded-lg overflow-hidden max-w-sm lg:max-w-4xl w-full">
-          <div
-            className="hidden lg:block lg:w-1/2 bg-cover"
-            style={{
-              backgroundImage:
-                'url("https://images.unsplash.com/photo-1593548615309-5a45c504f994?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
-            }}
-          ></div>
-          <div className="w-full p-8 lg:w-1/2">
-            <form onSubmit={handleLogin}>
-              <h2 className="text-2xl font-semibold text-center text-[#8B4513]">
-                Delizioso
-              </h2>
-              <p className="text-xl text-[#2f3640] text-center">
-                Welcome back!
-              </p>
+    <div className="h-screen flex flex-col lg:flex-row">
+      {/* Background Image */}
+      <div className="hidden lg:flex w-1/2">
+        <img
+          src="./loginBG.webp"
+          alt="Login"
+          className="object-cover w-full h-full"
+        />
+      </div>
 
-              <div className="mt-4 flex items-center justify-between">
-                <span className="border-b w-1/5 lg:w-1/4 border-[#8B4513]"></span>
-                <p className="text-xs text-center text-[#2f3640] uppercase">
-                  Login with email
-                </p>
-                <span className="border-b w-1/5 lg:w-1/4 border-[#8B4513]"></span>
-              </div>
+      {/* Login Form */}
+      <div className="flex flex-col justify-center items-center w-full lg:w-1/2 min-h-screen p-8">
+        <div className="w-full max-w-md">
+          <h1 className="text-4xl font-bold mb-2 text-center">Welcome Back</h1>
+          <p className="text-gray-600 text-center mb-6">
+            Sign in to access your account
+          </p>
 
-              <div className="mt-4">
-                <label className="block text-[#2f3640] text-sm font-bold mb-2">
-                  Email
-                </label>
-                <input
-                  className="bg-gray-200 text-[#2f3640] rounded py-2 px-4 block w-full appearance-none focus:outline-none focus:shadow-md"
-                  type="email"
-                  value={email}
-                  placeholder="Enter your email"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
+          <form onSubmit={handleLogin} className="space-y-4">
+            {/* Email Input */}
+            <div>
+              <label className="text-sm font-medium">Email</label>
+              <input
+                className="border bg-[#FFFCF9] py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1 rounded-md"
+                type="email"
+                value={email}
+                placeholder="Enter your email"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-              <div className="mt-4">
-                <label className="block text-[#2f3640] text-sm font-bold mb-2">
-                  Password
-                </label>
-                <input
-                  className="bg-gray-200 text-[#2f3640] rounded py-2 px-4 block w-full appearance-none focus:outline-none focus:shadow-md"
-                  type="password"
-                  value={password}
-                  placeholder="Enter your password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+            {/* Password Input */}
+            <div>
+              <label className="text-sm font-medium">Password</label>
+              <input
+                className="border bg-[#FFFCF9] py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1 rounded-md"
+                type="password"
+                value={password}
+                placeholder="Enter your password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-              <div className="mt-8">
-                <button className="bg-[#8B4513] text-white font-bold py-2 px-4 w-full rounded hover:bg-[#B22222] transition duration-300">
-                  Login
-                </button>
-              </div>
-            </form>
-          </div>
+            {/* Login Button */}
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Logging in..." : "Login"}
+            </Button>
+          </form>
+
+          <p className="text-gray-600 text-center mt-4">
+            Don't have an account?{" "}
+            <span className="text-blue-500">
+              Contact Admin to create an account
+            </span>
+          </p>
         </div>
       </div>
-    </>
+    </div>
   );
 }

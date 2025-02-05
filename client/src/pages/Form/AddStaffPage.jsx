@@ -42,19 +42,22 @@ export default function AddStaffPage() {
       navigate("/");
     } catch (error) {
       if (error.response) {
-        const errorData = error.response.data.message;
-        // console.log(errorData, "This error data");
-        errorData.map((el) =>
-          toast.error(`${el}`, {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          })
-        );
+        const errorData = error.response.data;
+        if (Array.isArray(errorData)) {
+          errorData.map((el) =>
+            toast.error(`${el.message}`, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            })
+          );
+        } else {
+          
+        }
       } else {
         toast.error("Network error, please try again later!", {
           position: "top-right",
@@ -133,7 +136,7 @@ export default function AddStaffPage() {
             </div>
 
             <div className="flex justify-end mt-8">
-              <button className="px-8 py-3 text-white bg-[#8B4513] rounded-md hover:bg-[#B22222] focus:outline-none focus:bg-gray-600 transition-colors">
+              <button className="px-8 py-3 text-white bg-[#8B4513] rounded-md hover:bg-[#B22222] focus:outline-none transition-colors">
                 Save
               </button>
             </div>
