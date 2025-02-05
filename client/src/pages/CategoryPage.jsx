@@ -9,6 +9,17 @@ export default function CategoryPage() {
 
   const handleAddCategory = useCallback(
     async (e) => {
+      e.preventDefault();
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) throw new Error("No access token found");
+
+        const { data } = await axios.post(
+          "/categories",
+          { name },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
         setCategory((prev) => [...prev, data]);
         toast.success("Successfully added category!", { transition: Bounce });
         setName("");
