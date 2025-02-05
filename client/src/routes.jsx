@@ -6,7 +6,7 @@ import LoginPage from "./pages/LoginPage";
 const Dashboard = lazy(() => import("./pages/DashboardPage"));
 const AddCuisinePage = lazy(() => import("./pages/Form/AddCuisinePage"));
 const AddStaffPage = lazy(() => import("./pages/Form/AddStaffPage"));
-const CategoryPage = lazy(() => import("./pages/Category/CategoryPage"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const CuisineDetailPage = lazy(() =>
   import("./pages/Cuisine/CuisineDetailPage")
 );

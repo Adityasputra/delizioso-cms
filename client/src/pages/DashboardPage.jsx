@@ -1,6 +1,6 @@
 import axios from "../services/axiosServices";
 import { useEffect, useState } from "react";
-import TableCuisine from "../components/TableCuisine";
+import TableCuisine from "../components/ui/tables/TableCuisine";
 
 export default function Dashboard() {
   const [data, setData] = useState([]);
