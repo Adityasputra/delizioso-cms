@@ -51,7 +51,7 @@ export default function AddCuisinePage() {
         theme: "light",
         transition: Bounce,
       });
-      
+
       navigate("/");
     } catch (error) {
       if (error.response) {
