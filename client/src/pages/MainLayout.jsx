@@ -20,11 +20,7 @@ export default function MainLayout() {
   if (!isDesktop) return <WarningDesktopOnly />;
 
   return (
-    <div className="min-h-screen flex bg-gray-100 overflow-hidden">
-      {/* <aside className="hidden lg:block w-64 bg-white shadow-md h-full">
-        // <Sidebar />
-      </aside> */}
-
+    <div className="min-h-screen flex overflow-hidden">
       <Sidebar />
       <main className="flex-1 p-4">
         <Outlet />
