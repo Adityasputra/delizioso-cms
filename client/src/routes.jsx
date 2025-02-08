@@ -7,9 +7,7 @@ const Dashboard = lazy(() => import("./pages/DashboardPage"));
 const AddCuisinePage = lazy(() => import("./pages/Form/AddCuisinePage"));
 const AddStaffPage = lazy(() => import("./pages/Form/AddStaffPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
-const CuisineDetailPage = lazy(() =>
-  import("./pages/Cuisine/CuisineDetailPage")
-);
+const CuisineDetailPage = lazy(() => import("./pages/CuisineDetailPage"));
 const EditCuisinePage = lazy(() => import("./pages/Form/EditCuisinePage"));
 
 const requireAuth = () => {
