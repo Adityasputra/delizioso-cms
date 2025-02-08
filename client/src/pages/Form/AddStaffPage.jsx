@@ -3,146 +3,86 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Button from "../../components/ui/Button";
 
 export default function AddStaffPage() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleAddStaff = async (e) => {
     e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
     try {
-      await axios({
-        method: "POST",
-        url: "/users",
-        headers: {
-          Authorization: `Bearer ${localStorage.access_token}`,
-        },
-        data: {
-          username,
-          email,
-          password,
-        },
+      await axios.post("/users", form, {
+        headers: { Authorization: `Bearer ${localStorage.access_token}` },
       });
 
       toast.success("Successfully added new staff!", {
         position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
+        autoClose: 3000,
         theme: "light",
         transition: Bounce,
       });
 
       navigate("/");
     } catch (error) {
-      if (error.response) {
-        const errorData = error.response.data;
-        if (Array.isArray(errorData)) {
-          errorData.map((el) =>
-            toast.error(`${el.message}`, {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            })
-          );
-        } else {
-          
-        }
-      } else {
-        toast.error("Network error, please try again later!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
+      const messages = Array.isArray(error.response?.data)
+        ? error.response.data
+        : [
+            error.response?.data?.message ||
+              "Network error, please try again later!",
+          ];
 
-      console.log(error);
+      messages.forEach((msg) =>
+        toast.error(msg, {
+          position: "top-right",
+          autoClose: 3000,
+        })
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <section className="max-w-2xl w-full p-8 mx-auto bg-white rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold text-center text-[#B22222] mb-6 capitalize">
-            Add New Staff
-          </h2>
-          <form onSubmit={handleAddStaff}>
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <label
-                  className="block text-gray-700 font-medium"
-                  htmlFor="username"
-                >
-                  Username
+    <div className="flex items-center justify-center min-h-screen">
+      <section className="max-w-2xl w-full p-8 mx-auto bg-white rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold text-center text-[#181818] mb-6 capitalize">
+          Add New Staff
+        </h2>
+        <form onSubmit={handleAddStaff}>
+          <div className="grid grid-cols-1 gap-6">
+            {["username", "email", "password"].map((field) => (
+              <div key={field}>
+                <label className="block text-gray-700 font-medium capitalize">
+                  {field}
                 </label>
                 <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter username"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none transition-colors"
+                  type={field === "password" ? "password" : "text"}
+                  name={field}
+                  value={form[field]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${field}`}
+                  disabled={loading}
+                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-[#181818] focus:outline-none transition-colors"
                 />
               </div>
-
-              <div>
-                <label
-                  className="block text-gray-700 font-medium"
-                  htmlFor="emailAddress"
-                >
-                  Email
-                </label>
-                <input
-                  id="emailAddress"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter email"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none transition-colors"
-                />
-              </div>
-
-              <div>
-                <label
-                  className="block text-gray-700 font-medium"
-                  htmlFor="password"
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end mt-8">
-              <button className="px-8 py-3 text-white bg-[#8B4513] rounded-md hover:bg-[#B22222] focus:outline-none transition-colors">
-                Save
-              </button>
-            </div>
-          </form>
-        </section>
-      </div>
-    </>
+            ))}
+          </div>
+          <div className="flex justify-end mt-8">
+            <Button type="submit" disabled={loading}>
+              {loading ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        </form>
+      </section>
+    </div>
   );
 }

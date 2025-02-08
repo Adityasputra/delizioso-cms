@@ -1,7 +1,9 @@
-import axios from "../../services/axiosServices";
+import axios from "../services/axiosServices";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { formatRupiah } from "../../helper/rupiahFormatHelper";
+import { formatRupiah } from "../helper/rupiahFormatHelper";
+import { IoIosArrowBack } from "react-icons/io";
+import Button from "../components/ui/Button";
 
 export default function CuisineDetailPage() {
   const [data, setData] = useState(null);
@@ -55,27 +57,13 @@ export default function CuisineDetailPage() {
             </p>
 
             <div className="flex justify-start mt-8">
-              <button
-                title="Go Back"
-                className="p-2 flex items-center border text-[#fffcf9] transition-colors duration-300 rounded-full hover:bg-[#fffcf9] hover:text-[#181818]"
+              <Button
+                className="flex items-center uppercase gap-2 text-[#fffcf9] hover:bg-white hover:text-[#181818] transition-colors duration-300"
                 onClick={() => navigate("/")}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-                BACK
-              </button>
+                <IoIosArrowBack className="h-5 w-5" />
+                back
+              </Button>
             </div>
           </div>
         </div>
