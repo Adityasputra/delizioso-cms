@@ -2,6 +2,7 @@ import { createBrowserRouter, redirect } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import MainLayout from "./pages/MainLayout";
 import LoginPage from "./pages/LoginPage";
+import UserListPage from "./pages/StaffPage";
 
 const Dashboard = lazy(() => import("./pages/DashboardPage"));
 const AddCuisinePage = lazy(() => import("./pages/Form/AddCuisinePage"));
@@ -36,6 +37,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <Dashboard />
+          </Suspense>
+        ),
+      },
+      {
+        path: "users",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <UserListPage />
           </Suspense>
         ),
       },
