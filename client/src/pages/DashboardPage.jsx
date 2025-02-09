@@ -2,6 +2,7 @@ import axios from "../services/axiosServices";
 import { useEffect, useState } from "react";
 import TableCuisine from "../components/ui/tables/TableCuisine";
 import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 export default function Dashboard() {
   const [data, setData] = useState([]);
@@ -56,12 +57,12 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-4 w-1/2">
-        <input
+        <Input
           type="text"
           placeholder="Search cuisine..."
-          className="w-full p-2 border rounded-md"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="w-1/3"
         />
       </div>
 
