@@ -2,11 +2,11 @@
 
 ## Project Description
 
-Delizioso is a culinary data management platform consisting of three main parts:
+Delizioso is an innovative culinary data management platform designed to streamline food data organization and enhance user experience. Whether you're a restaurant staff member managing menu items or a food enthusiast exploring delightful cuisines, Delizioso provides a seamless solution. It consists of three main parts:
 
-1. **Client Side** – A food data management system used by staff.
-2. **Public Side** – A public interface accessible to everyone without login requirements.
-3. **Server Side** – An API managing data and communication between the client and public sides.
+1. **Client Side** – A robust system enabling staff to efficiently manage food data, ensuring accuracy and ease of access.
+2. **Public Side** – A beautifully designed public interface, allowing users to browse and explore a diverse collection of cuisines without any login barriers.
+3. **Server Side** – A powerful API that acts as the backbone, handling data management and communication between the client and public interfaces.
 
 ## Project Structure
 
@@ -72,7 +72,7 @@ The public website will run at `http://localhost:4000`
 
 ## Technologies Used
 
-- **Frontend**: React.js
+- **Frontend**: React.js / Next.js
 - **Backend**: Node.js, Express.js
-- **Database**: PostgreSQL
+- **Database**: PostgreSQL / MongoDB
 - **Authentication**: JWT (for staff access)
