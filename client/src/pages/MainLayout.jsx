@@ -20,7 +20,9 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen flex overflow-hidden">
-      <Sidebar />
+      <div>
+        <Sidebar />
+      </div>
       <main className="flex-1">
         <Outlet />
       </main>
