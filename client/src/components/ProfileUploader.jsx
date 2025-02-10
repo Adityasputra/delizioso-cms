@@ -3,6 +3,7 @@ import axios from "../services/axiosServices";
 import UploadInfo from "./UploadInfo";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Input from "./ui/Input";
 
 export default function ProfileUploader({ user, setUser }) {
   const fileInputRef = useRef(null);

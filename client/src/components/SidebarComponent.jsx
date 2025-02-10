@@ -57,10 +57,8 @@ export default function Sidebar() {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="bg-white shadow-md h-screen flex flex-col overflow-hidden"
     >
-      {/* Profil User dengan Upload */}
       <ProfileUploader user={user} setUser={setUser} />
 
-      {/* Menu Sidebar */}
       <nav className="mt-4 flex-1">
         {menuItems.map((item, index) => (
           <motion.button

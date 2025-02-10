@@ -89,7 +89,7 @@ export default function TableCuisine({ data, onRemoveCuisine }) {
           <Button
             onClick={() => handleRemoveCuisine(data.id)}
             disabled={isDeleting}
-            className={`bg-transparent ${
+            className={`px-0 py-0 bg-transparent ${
               isDeleting && "opacity-50 cursor-not-allowed"
             }`}
           >
