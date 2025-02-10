@@ -72,7 +72,7 @@ The public website will run at `http://localhost:4000`
 
 ## Technologies Used
 
-- **Frontend**: React.js / Next.js
+- **Frontend**: React.js
 - **Backend**: Node.js, Express.js
-- **Database**: PostgreSQL / MongoDB
+- **Database**: PostgreSQL
 - **Authentication**: JWT (for staff access)
