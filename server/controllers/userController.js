@@ -72,33 +72,78 @@ module.exports = class UserController {
 
   static async updateProfileUser(req, res, next) {
     try {
+      console.log("📌 [START] Update Profile API called");
+
       const { id } = req.user;
       const { username } = req.body;
-      let option = {};
+      console.log("📝 Request body:", { username });
+
+      const option = {};
 
       if (username) {
-        option = { ...option, username: username };
+        console.log("✅ Username updated:", username);
+        option.username = username;
       }
 
       if (req.file) {
-        const b64File = Buffer.from(req.file.buffer).toString("base64");
-        const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
+        console.log("📂 File received:", req.file.originalname);
+        console.log("📏 File size:", req.file.size);
+        console.log("📦 Buffer length:", req.file.buffer.length);
+        console.log("🖼️ MIME type:", req.file.mimetype);
 
-        const uploadResult = await cloudinary.uploader.upload(dataURI, {
-          folder: "delizioso-profile",
-        });
+        const allowedFormats = [
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ];
+        if (!allowedFormats.includes(req.file.mimetype)) {
+          throw {
+            name: "BadRequest",
+            message: "Invalid file format. Use JPG, PNG, or WebP.",
+          };
+        }
 
-        option = { ...option, imageUrl: uploadResult.secure_url };
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (req.file.size > maxSize) {
+          throw { name: "BadRequest", message: "File size exceeds 5MB limit." };
+        }
+
+        try {
+          console.log("🚀 Uploading to Cloudinary...");
+          const b64File = Buffer.from(req.file.buffer).toString("base64");
+          const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
+
+          const timestamp = Date.now();
+          const uploadResult = await cloudinary.uploader.upload(dataURI, {
+            folder: "delizioso-profile",
+            public_id: `profile_${id}_${timestamp}`,
+          });
+
+          console.log("✅ Upload successful:", uploadResult.secure_url);
+          option.imageUrl = uploadResult.secure_url;
+        } catch (uploadError) {
+          console.error("❌ Error uploading to Cloudinary:", uploadError);
+          throw { name: "BadRequest", message: "Failed to upload image" };
+        }
+      } else {
+        console.log("⚠️ No file uploaded. Skipping image update.");
       }
 
-      await User.update(option, {
-        where: { id },
-      });
+      console.log("💾 Updating user profile...");
+      const [updatedRows] = await User.update(option, { where: { id } });
 
-      res.status(200).json({
-        message: "Successfully to update Profile",
-      });
+      if (updatedRows === 0) {
+        console.log("⚠️ No changes made or user not found.");
+        return res
+          .status(404)
+          .json({ message: "User not found or no changes made" });
+      }
+
+      console.log(`✅ User ID ${id} profile updated successfully`, option);
+      res.status(200).json({ message: "Profile updated successfully" });
     } catch (error) {
+      console.error("❌ Error in updateProfileUser:", error);
       next(error);
     }
   }

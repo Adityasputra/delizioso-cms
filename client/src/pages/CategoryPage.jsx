@@ -2,14 +2,18 @@ import { Bounce, toast } from "react-toastify";
 import axios from "../services/axiosServices";
 import { useEffect, useState, useCallback } from "react";
 import TableCategory from "../components/ui/tables/TableCategory";
+import Button from "../components/ui/Button";
 
 export default function CategoryPage() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleAddCategory = useCallback(
     async (e) => {
       e.preventDefault();
+      setLoading(true);
+
       try {
         const token = localStorage.getItem("access_token");
         if (!token) throw new Error("No access token found");
@@ -30,6 +34,8 @@ export default function CategoryPage() {
         (Array.isArray(message) ? message : [message]).forEach((msg) =>
           toast.error(msg)
         );
+      } finally {
+        setLoading(false);
       }
     },
     [name]
@@ -96,12 +102,9 @@ export default function CategoryPage() {
               className="shadow border rounded w-full py-2 px-3 text-gray-700 focus:outline-none"
             />
           </div>
-          <button
-            type="submit"
-            className="bg-[#181818] text-[#fffcf9] px-4 py-2 rounded hover:bg-gray-700 transition"
-          >
-            Add Category
-          </button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Adding Category..." : "Add Category"}
+          </Button>
         </form>
       </div>
     </div>

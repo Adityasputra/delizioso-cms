@@ -8,6 +8,7 @@ import { useState } from "react";
 import { GoTrash } from "react-icons/go";
 import { FaRegEdit } from "react-icons/fa";
 import { TbListDetails } from "react-icons/tb";
+import Button from "../Button";
 
 export default function TableCuisine({ data, onRemoveCuisine }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,15 +86,15 @@ export default function TableCuisine({ data, onRemoveCuisine }) {
       </td>
       <td className="px-4 py-4 text-sm whitespace-nowrap">
         <div className="flex items-center gap-x-6">
-          <button
-            className={`text-gray-500 hover:text-red-500 ${
-              isDeleting && "opacity-50 cursor-not-allowed"
-            }`}
+          <Button
             onClick={() => handleRemoveCuisine(data.id)}
             disabled={isDeleting}
+            className={`px-0 py-0 bg-transparent ${
+              isDeleting && "opacity-50 cursor-not-allowed"
+            }`}
           >
-            <GoTrash className="w-5 h-5" />
-          </button>
+            <GoTrash className="w-5 h-5 text-gray-500 hover:text-red-500" />
+          </Button>
           <Link
             className="text-gray-500 hover:text-yellow-500"
             to={`/cuisine/${data.id}/edit`}

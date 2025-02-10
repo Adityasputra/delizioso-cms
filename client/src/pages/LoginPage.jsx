@@ -52,7 +52,7 @@ export default function LoginPage() {
             <div>
               <label className="text-sm font-medium">Email</label>
               <input
-                className="border bg-[#FFFCF9] py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1 rounded-md"
+                className="border focus:border-[#181818] hover:border-[#181818] bg-[#FFFCF9] py-2 px-4 w-full focus:outline-none mt-1 rounded-md"
                 type="email"
                 value={email}
                 placeholder="Enter your email"
@@ -64,7 +64,7 @@ export default function LoginPage() {
             <div>
               <label className="text-sm font-medium">Password</label>
               <input
-                className="border bg-[#FFFCF9] py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1 rounded-md"
+                className="border bg-[#FFFCF9] focus:border-[#181818] hover:border-[#181818] py-2 px-4 w-full focus:outline-none mt-1 rounded-md"
                 type="password"
                 value={password}
                 placeholder="Enter your password"
