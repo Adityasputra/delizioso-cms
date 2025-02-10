@@ -1,42 +1,44 @@
 const { comparePass } = require("../helpers/bcryptjsHelper");
 const { signInToken } = require("../helpers/jwtHelper");
 const { User } = require("../models");
-
 const cloudinary = require("../config/cloudinary");
 
 module.exports = class UserController {
   static async login(req, res, next) {
     try {
+      console.log("[INFO] Login API called");
+
       const { email, password } = req.body;
-      if (!email || !password)
-        throw { name: "BadRequest", message: "Email / Password is required" };
+      if (!email?.trim() || !password?.trim()) {
+        throw {
+          name: "BadRequest",
+          message: "Email and Password are required",
+        };
+      }
 
-      const findUser = await User.findOne({ where: { email } });
-      if (!findUser) throw { name: "Unauthorized" };
+      const user = await User.findOne({ where: { email } });
+      if (!user || !comparePass(password, user.password)) {
+        throw { name: "Unauthorized" };
+      }
 
-      const comparePassword = comparePass(password, findUser.password);
-      if (!comparePassword) throw { name: "Unauthorized" };
+      const access_token = signInToken({ id: user.id, role: user.role });
 
-      const access_token = signInToken({
-        id: findUser.id,
-        role: findUser.role,
-      });
-
+      console.log(`[SUCCESS] User ${user.email} logged in`);
       res.status(200).json({ access_token });
     } catch (error) {
+      console.error("[ERROR] Login failed:", error);
       next(error);
     }
   }
 
   static async addUser(req, res, next) {
     try {
-      const { username, email, password } = req.body;
-      const newUser = await User.create({
-        username,
-        email,
-        password,
-      });
+      console.log("[INFO] Register API called");
 
+      const { username, email, password } = req.body;
+      const newUser = await User.create({ username, email, password });
+
+      console.log(`[SUCCESS] User ${newUser.email} registered`);
       res.status(201).json({
         id: newUser.id,
         username: newUser.username,
@@ -44,52 +46,55 @@ module.exports = class UserController {
         role: newUser.role,
       });
     } catch (error) {
-      console.log(error);
+      console.error("[ERROR] Registration failed:", error);
       next(error);
     }
   }
 
   static async getUser(req, res, next) {
     try {
+      console.log("[INFO] Fetching logged-in user");
       res.status(200).json(req.user);
     } catch (error) {
+      console.error("[ERROR] Failed to fetch user:", error);
       next(error);
     }
   }
 
   static async getAllUsers(req, res, next) {
     try {
+      console.log("[INFO] Fetching all users");
+
       const users = await User.findAll({
-        attributes: {
-          exclude: ["password"],
-        },
+        attributes: { exclude: ["password"] },
       });
+
+      console.log(`[SUCCESS] Retrieved ${users.length} users`);
       res.status(200).json(users);
     } catch (error) {
+      console.error("[ERROR] Failed to fetch users:", error);
       next(error);
     }
   }
 
   static async updateProfileUser(req, res, next) {
     try {
-      console.log("📌 [START] Update Profile API called");
+      console.log("[INFO] Update Profile API called");
 
       const { id } = req.user;
       const { username } = req.body;
-      console.log("📝 Request body:", { username });
 
-      const option = {};
-
-      if (username) {
-        console.log("✅ Username updated:", username);
-        option.username = username;
+      let updates = {};
+      if (username?.trim()) {
+        console.log(`[INFO] Updating username: ${username}`);
+        updates.username = username;
       }
 
       if (req.file) {
-        console.log("📂 File received:", req.file.originalname);
-        console.log("📏 File size:", req.file.size);
-        console.log("📦 Buffer length:", req.file.buffer.length);
-        console.log("🖼️ MIME type:", req.file.mimetype);
+        console.log("[INFO] Processing profile image upload");
+
+        const { originalname, mimetype, size, buffer } = req.file;
+        console.log(`📂 File: ${originalname} (${mimetype}, ${size} bytes)`);
 
         const allowedFormats = [
           "image/jpeg",
@@ -97,7 +102,7 @@ module.exports = class UserController {
           "image/gif",
           "image/webp",
         ];
-        if (!allowedFormats.includes(req.file.mimetype)) {
+        if (!allowedFormats.includes(mimetype)) {
           throw {
             name: "BadRequest",
             message: "Invalid file format. Use JPG, PNG, or WebP.",
@@ -105,45 +110,45 @@ module.exports = class UserController {
         }
 
         const maxSize = 5 * 1024 * 1024; // 5MB
-        if (req.file.size > maxSize) {
+        if (size > maxSize) {
           throw { name: "BadRequest", message: "File size exceeds 5MB limit." };
         }
 
-        try {
-          console.log("🚀 Uploading to Cloudinary...");
-          const b64File = Buffer.from(req.file.buffer).toString("base64");
-          const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
+        console.log("[INFO] Uploading to Cloudinary...");
+        const dataURI = `data:${mimetype};base64,${buffer.toString("base64")}`;
+        const uploadResult = await cloudinary.uploader.upload(dataURI, {
+          folder: "delizioso-profile",
+          public_id: `profile_${id}_${Date.now()}`,
+        });
 
-          const timestamp = Date.now();
-          const uploadResult = await cloudinary.uploader.upload(dataURI, {
-            folder: "delizioso-profile",
-            public_id: `profile_${id}_${timestamp}`,
-          });
-
-          console.log("✅ Upload successful:", uploadResult.secure_url);
-          option.imageUrl = uploadResult.secure_url;
-        } catch (uploadError) {
-          console.error("❌ Error uploading to Cloudinary:", uploadError);
-          throw { name: "BadRequest", message: "Failed to upload image" };
-        }
-      } else {
-        console.log("⚠️ No file uploaded. Skipping image update.");
+        console.log(`[SUCCESS] Image uploaded: ${uploadResult.secure_url}`);
+        updates.imageUrl = uploadResult.secure_url;
       }
 
-      console.log("💾 Updating user profile...");
-      const [updatedRows] = await User.update(option, { where: { id } });
-
-      if (updatedRows === 0) {
-        console.log("⚠️ No changes made or user not found.");
-        return res
-          .status(404)
-          .json({ message: "User not found or no changes made" });
+      if (Object.keys(updates).length === 0) {
+        console.log("[INFO] No updates made");
+        return res.status(400).json({ message: "No changes provided" });
       }
 
-      console.log(`✅ User ID ${id} profile updated successfully`, option);
-      res.status(200).json({ message: "Profile updated successfully" });
+      console.log("[INFO] Updating user profile...");
+      const updatedUser = await User.findByPk(id);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      await updatedUser.update(updates);
+      console.log(`[SUCCESS] User ID ${id} profile updated`);
+
+      res.status(200).json({
+        message: "Profile updated successfully",
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          imageUrl: updatedUser.imageUrl,
+        },
+      });
     } catch (error) {
-      console.error("❌ Error in updateProfileUser:", error);
+      console.error("[ERROR] Failed to update profile:", error);
       next(error);
     }
   }
