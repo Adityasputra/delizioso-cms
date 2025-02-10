@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import axios from "../services/axiosServices";
 import UploadInfo from "./UploadInfo";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ProfileUploader({ user, setUser }) {
   const fileInputRef = useRef(null);
@@ -8,26 +10,36 @@ export default function ProfileUploader({ user, setUser }) {
 
   const handleUpload = async (event) => {
     const file = event.target.files[0];
-    if (!file) return;
+    if (!file) {
+      toast.warn("No file selected!");
+      return;
+    }
+
+    console.log("Selected file:", file.name, "Size:", file.size);
 
     setLoading(true);
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("imageUrl", file);
 
     try {
-      const { data } = await axios.put("/profile/update", formData, {
+      const { data } = await axios.put("/profile", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
+      console.log("Image uploaded successfully:", data);
+
       setUser((prevUser) => ({
         ...prevUser,
         imageUrl: data.imageUrl,
       }));
+
+      toast.success("Profile image updated successfully!");
     } catch (error) {
-      console.error("Failed to upload image", error);
+      console.error("Failed to upload image:", error.response || error.message);
+      toast.error("Failed to upload image. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -36,7 +48,6 @@ export default function ProfileUploader({ user, setUser }) {
   return (
     <div className="px-4 py-4 border-b">
       <UploadInfo />
-
       <div className="flex items-center gap-3 mt-3">
         <input
           type="file"
