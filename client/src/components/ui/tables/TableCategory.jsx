@@ -1,6 +1,7 @@
 import axios from "../../../services/axiosServices";
 import { Bounce, toast } from "react-toastify";
 import { GoTrash } from "react-icons/go";
+import Button from "../Button";
 
 export default function TableCategory({ data, onRemoveCategory }) {
   const handleRemoveCategory = async (id) => {
@@ -36,12 +37,12 @@ export default function TableCategory({ data, onRemoveCategory }) {
         {data.name}
       </td>
       <td className="px-4 py-4 text-sm font-medium text-gray-700 text-center">
-        <button
-          className="text-gray-500 hover:text-red-500 transition-colors duration-200 focus:outline-none"
+        <Button
+          className="text-gray-500 bg-transparent"
           onClick={() => handleRemoveCategory(data.id)}
         >
-          <GoTrash className="w-5 h-5" />
-        </button>
+          <GoTrash className="w-5 h-5 text-gray-500 hover:text-red-500 transition-colors duration-200" />
+        </Button>
       </td>
     </tr>
   );
