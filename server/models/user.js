@@ -1,76 +1,97 @@
 "use strict";
 const { Model } = require("sequelize");
-const { hashPassword } = require("../helpers/bcryptjsHelper");
+const { hashPassword } = require("../helpers/bcryptjs");
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      User.hasMany(models.Cuisine);
+      User.hasMany(models.Cuisine, { foreignKey: "UserId" });
     }
   }
+
   User.init(
     {
       username: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
         validate: {
-          notEmpty: {
-            msg: "Username is required",
-          },
-          notNull: {
-            msg: "Username is required",
+          notEmpty: { msg: "Username is required" },
+          notNull: { msg: "Username is required" },
+          len: {
+            args: [3, 50],
+            msg: "Username must be between 3 and 50 characters",
           },
         },
       },
       email: {
-        type: DataTypes.STRING,
-        unique: {
-          msg: "Email is already used",
-        },
+        type: DataTypes.STRING(255),
         allowNull: false,
+        unique: true,
         validate: {
-          notEmpty: {
-            msg: "Email is required",
-          },
-          notNull: {
-            msg: "Email is required",
-          },
-          isEmail: {
-            msg: "Must be email formatted",
-          },
+          notEmpty: { msg: "Email is required" },
+          notNull: { msg: "Email is required" },
+          isEmail: { msg: "Must be a valid email" },
         },
       },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notEmpty: {
-            msg: "Password is required",
-          },
-          notNull: {
-            msg: "Password is required",
+          notEmpty: { msg: "Password is required" },
+          notNull: { msg: "Password is required" },
+          len: {
+            args: [8, 100],
+            msg: "Password must be at least 8 characters long",
           },
         },
       },
       role: {
         type: DataTypes.STRING,
         defaultValue: "staff",
+        validate: {
+          isIn: {
+            args: [["admin", "staff"]],
+            msg: "Role must be either 'admin' or 'staff'",
+          },
+        },
       },
-      imageUrl: DataTypes.STRING,
+      imageUrl: {
+        type: DataTypes.STRING(2083),
+        validate: {
+          isUrl: { msg: "Image must be a valid URL" },
+        },
+      },
     },
     {
       hooks: {
-        beforeCreate(instance) {
-          instance.password = hashPassword(instance.password);
+        beforeValidate(user) {
+          if (user.email) {
+            user.email = user.email.trim().toLowerCase();
+          }
+          if (user.username) {
+            user.username = user.username.trim();
+          }
+        },
+        beforeCreate(user) {
+          user.password = hashPassword(user.password);
+        },
+        beforeUpdate(user) {
+          if (user.changed("password")) {
+            user.password = hashPassword(user.password);
+          }
         },
       },
       sequelize,
       modelName: "User",
+      timestamps: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["email"],
+        },
+      ],
     }
   );
+
   return User;
 };
