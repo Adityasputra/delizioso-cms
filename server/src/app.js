@@ -1,15 +1,27 @@
 if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
+  require("dotenv").config({
+    path: require("path").resolve(__dirname, "../.env"),
+  });
 }
 
 const express = require("express");
-const app = express();
 const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
 const router = require("../routes/index");
 
-app.use(express.urlencoded({ extended: false }));
+const app = express();
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use(helmet());
+app.use(morgan("dev"));
+
 app.use("/", router);
+
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
 
 module.exports = app;
