@@ -25,7 +25,7 @@ export default function TableCuisine({ data, onRemoveCuisine }) {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      onRemoveCuisine((prev) => prev.filter((cuisine) => cuisine.id !== id));
+      onRemoveCuisine(id);
 
       toast.success("Successfully deleted cuisine!", {
         position: "top-right",
@@ -73,7 +73,7 @@ export default function TableCuisine({ data, onRemoveCuisine }) {
       <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
         {data.name}
       </td>
-      <td className="px-4 py-4 text-sm text-gray-500 whitespace-wrap line-clamp-1">
+      <td className="px-4 py-4 text-sm text-gray-500 whitespace-normal line-clamp-1">
         {data.description}
       </td>
       <td className="px-4 py-4 text-center text-sm whitespace-nowrap">

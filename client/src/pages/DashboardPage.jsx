@@ -19,9 +19,11 @@ export default function Dashboard() {
       setLoading(true);
       try {
         const token = localStorage.getItem("access_token");
-        console.log("🔹 Access Token:", token);
 
-        if (!token) throw new Error("No access token found");
+        if (!token) {
+          console.error("🔹 No access token found");
+          return;
+        }
 
         const [cuisineRes, usersRes] = await Promise.all([
           axios.get(
@@ -36,7 +38,7 @@ export default function Dashboard() {
         ]);
 
         setData(cuisineRes.data.data);
-        console.log("🔹 Fetched Cuisines:", cuisineRes.data.data);
+        setUsers(usersRes.data);
 
         const fetchedTotalPages = cuisineRes.data.totalPages || 1;
         setTotalPage(fetchedTotalPages);
@@ -44,10 +46,8 @@ export default function Dashboard() {
         if (currentPage > fetchedTotalPages) {
           setPage(1);
         }
-
-        setUsers(usersRes.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("❌ Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -64,8 +64,10 @@ export default function Dashboard() {
   );
 
   useEffect(() => {
-    fetchData(search, page);
-  }, [search, page]);
+    if (localStorage.getItem("access_token")) {
+      fetchData(search, page);
+    }
+  }, [fetchData, search, page]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -74,6 +76,10 @@ export default function Dashboard() {
 
   const handleRemoveCuisine = (id) => {
     setData((prevData) => prevData.filter((cuisine) => cuisine.id !== id));
+
+    if (data.length === 1 && page > 1) {
+      setPage((prev) => Math.max(1, prev - 1));
+    }
   };
 
   const headerClass =
@@ -156,12 +162,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="flex justify-center">
+      {/* Pagination */}
+      <div className="flex justify-center mt-4">
         <Button
           className={`px-4 py-2 mx-1 border-2 border-gray-300 bg-[#fffcf9] rounded-md ${
-            page <= 1
-              ? "opacity-50 bg-white border-2 border-gray-200 cursor-not-allowed"
-              : ""
+            page <= 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={page <= 1}
           onClick={() => setPage((prev) => Math.max(1, prev - 1))}
@@ -171,9 +176,7 @@ export default function Dashboard() {
         <span className="px-4 py-2 mx-1">{`Page ${page} of ${totalPage}`}</span>
         <Button
           className={`px-4 py-2 mx-1 border-2 border-gray-300 bg-[#fffcf9] rounded-md ${
-            page >= totalPage
-              ? "opacity-50 bg-white border-2 border-gray-200 cursor-not-allowed"
-              : ""
+            page >= totalPage ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={page >= totalPage}
           onClick={() => setPage((prev) => Math.min(totalPage, prev + 1))}
