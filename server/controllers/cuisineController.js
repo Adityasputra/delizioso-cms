@@ -1,5 +1,6 @@
 const { Cuisine, Category, User } = require("../models");
 const cloudinary = require("../config/cloudinary");
+const redis = require("../config/redis");
 const { Op } = require("sequelize");
 
 async function uploadImage(file) {
@@ -61,6 +62,9 @@ module.exports = class CuisineController {
       });
 
       console.log(`[SUCCESS] Cuisine '${newCuisine.name}' added`);
+
+      await redis.del("cuisine-list:");
+
       res.status(201).json(newCuisine);
     } catch (error) {
       console.error("[ERROR] Failed to add cuisine:", error);
@@ -74,9 +78,20 @@ module.exports = class CuisineController {
 
       let { search, page } = req.query;
 
-      const pageNumber = Math.max(Number(page?.number) || 1, 1); // Default page 1
-      const pageSize = Math.max(Number(page?.size) || 10, 1); // Default size 10
+      const pageNumber = Math.max(Number(page?.number) || 1, 1);
+      const pageSize = Math.max(Number(page?.size) || 6, 6);
+
       const offset = (pageNumber - 1) * pageSize;
+      const cacheKey = `cuisine-list:${
+        search || "all"
+      }:page${pageNumber}:size${pageSize}`;
+
+      // Cek cache di Redis
+      const cachedData = await redis.get(cacheKey);
+      if (cachedData) {
+        console.log(`🚀 Cache hit: ${cacheKey}`);
+        return res.status(200).json(JSON.parse(cachedData));
+      }
 
       const options = {
         limit: pageSize,
@@ -98,12 +113,18 @@ module.exports = class CuisineController {
       const cuisines = await Cuisine.findAndCountAll(options);
 
       console.log(`[SUCCESS] Retrieved ${cuisines.rows.length} cuisines`);
-      res.status(200).json({
+
+      const response = {
         totalItems: cuisines.count,
         totalPages: Math.ceil(cuisines.count / pageSize),
         currentPage: pageNumber,
+        pageSize: pageSize,
         data: cuisines.rows,
-      });
+      };
+
+      await redis.setex(cacheKey, 300, JSON.stringify(response));
+
+      res.status(200).json(response);
     } catch (error) {
       console.error("[ERROR] Failed to fetch cuisines:", error);
       next(error);
@@ -113,6 +134,14 @@ module.exports = class CuisineController {
   static async getDetailCuisine(req, res, next) {
     try {
       console.log("[INFO] Fetching cuisine details");
+
+      const cacheKey = `cuisine-detail:${req.params.id}`;
+
+      const cachedData = await redis.get(cacheKey);
+      if (cachedData) {
+        console.log(`🚀 Cache hit: ${cacheKey}`);
+        return res.status(200).json(JSON.parse(cachedData));
+      }
 
       const findCuisine = await Cuisine.findByPk(req.params.id, {
         include: [
@@ -126,6 +155,9 @@ module.exports = class CuisineController {
       }
 
       console.log(`[SUCCESS] Found cuisine '${findCuisine.name}'`);
+
+      await redis.setex(cacheKey, 300, JSON.stringify(findCuisine));
+
       res.status(200).json(findCuisine);
     } catch (error) {
       console.error("[ERROR] Failed to fetch cuisine details:", error);
@@ -162,6 +194,10 @@ module.exports = class CuisineController {
       await cuisine.update(updatedData);
 
       console.log(`[SUCCESS] Cuisine '${cuisine.name}' updated`);
+
+      await redis.del("cuisine-list:");
+      await redis.del(`cuisine-detail:${id}`);
+
       res
         .status(200)
         .json({ message: "Cuisine successfully updated", cuisine });
@@ -183,6 +219,10 @@ module.exports = class CuisineController {
       }
 
       console.log(`[SUCCESS] Cuisine ID ${id} deleted`);
+
+      await redis.del("cuisine-list:");
+      await redis.del(`cuisine-detail:${id}`);
+
       res.status(200).json({ message: "Cuisine successfully deleted" });
     } catch (error) {
       console.error("[ERROR] Failed to delete cuisine:", error);
