@@ -2,205 +2,190 @@ const { Cuisine, Category, User } = require("../models");
 const cloudinary = require("../config/cloudinary");
 const { Op } = require("sequelize");
 
+async function uploadImage(file) {
+  if (!file) return null;
+
+  const allowedFormats = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  if (!allowedFormats.includes(file.mimetype)) {
+    throw {
+      name: "BadRequest",
+      message: "Invalid file format. Use JPG, PNG, or WebP.",
+    };
+  }
+
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    throw { name: "BadRequest", message: "File size exceeds 10MB limit." };
+  }
+
+  console.log("🚀 Uploading image to Cloudinary...");
+  const dataURI = `data:${file.mimetype};base64,${file.buffer.toString(
+    "base64"
+  )}`;
+
+  let uploadResult;
+  try {
+    uploadResult = await cloudinary.uploader.upload(dataURI, {
+      folder: "delizioso-profile",
+      public_id: `${file.originalname.split(".")[0]}_${Date.now()}`,
+    });
+  } catch (error) {
+    console.error("[ERROR] Cloudinary upload failed:", error);
+    throw {
+      name: "UploadError",
+      message: "Image upload failed, please try again.",
+    };
+  }
+
+  return uploadResult.secure_url;
+}
+
 module.exports = class CuisineController {
   static async addCuisine(req, res, next) {
     try {
-      console.log("📌 [START] Add Cuisine API called");
+      console.log("[INFO] Adding new cuisine");
 
       const { name, description, price, CategoryId } = req.body;
-      console.log("📝 Request body:", { name, description, price, CategoryId });
-
       if (!name || !description || !price || !CategoryId) {
-        throw { name: "BadRequest", message: "All fields are required" };
+        return res.status(400).json({ message: "All fields are required" });
       }
 
-      let option = {
+      const imgUrl = req.file ? await uploadImage(req.file) : null;
+      const newCuisine = await Cuisine.create({
         name,
         description,
         price,
         CategoryId,
         UserId: req.user.id,
-      };
-      console.log("✅ Form data valid. Processing...");
+        imgUrl,
+      });
 
-      if (req.file) {
-        console.log("📂 File received:", req.file.originalname);
-        console.log("📏 File size:", req.file.size);
-        console.log("📦 Buffer length:", req.file.buffer.length);
-        console.log("🖼️ MIME type:", req.file.mimetype);
-
-        const allowedFormats = [
-          "image/jpeg",
-          "image/png",
-          "image/gif",
-          "image/webp",
-        ];
-        if (!allowedFormats.includes(req.file.mimetype)) {
-          throw {
-            name: "BadRequest",
-            message: "Invalid file format. Use JPG, PNG, or WebP.",
-          };
-        }
-
-        const maxSize = 10 * 1024 * 1024; // 10MB
-        if (req.file.size > maxSize) {
-          throw {
-            name: "BadRequest",
-            message: "File size exceeds 10MB limit.",
-          };
-        }
-
-        try {
-          console.log("🚀 Uploading to Cloudinary...");
-          const b64File = Buffer.from(req.file.buffer).toString("base64");
-          const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
-
-          const timestamp = Date.now();
-          const uploadResult = await cloudinary.uploader.upload(dataURI, {
-            folder: "delizioso-profile",
-            public_id: `${req.file.originalname.split(".")[0]}_${timestamp}`,
-          });
-
-          console.log("✅ Upload successful:", uploadResult.secure_url);
-          option.imgUrl = uploadResult.secure_url;
-        } catch (uploadError) {
-          console.error("❌ Error uploading to Cloudinary:", uploadError);
-          throw { name: "BadRequest", message: "Failed to upload image" };
-        }
-      } else {
-        console.log("⚠️ No file uploaded. Skipping image upload.");
-      }
-
-      console.log("💾 Saving to database...");
-      const newCuisine = await Cuisine.create(option);
-      console.log("✅ New cuisine added:", newCuisine);
-
+      console.log(`[SUCCESS] Cuisine '${newCuisine.name}' added`);
       res.status(201).json(newCuisine);
     } catch (error) {
-      console.error("❌ Error in addCuisine:", error);
+      console.error("[ERROR] Failed to add cuisine:", error);
       next(error);
     }
   }
 
   static async getAllCuisine(req, res, next) {
     try {
-      const { search, page } = req.query;
-      const paramsQuery = {
+      console.log("[INFO] Fetching all cuisines");
+
+      let { search, page } = req.query;
+
+      const pageNumber = Math.max(Number(page?.number) || 1, 1); // Default page 1
+      const pageSize = Math.max(Number(page?.size) || 10, 1); // Default size 10
+      const offset = (pageNumber - 1) * pageSize;
+
+      const options = {
+        limit: pageSize,
+        offset,
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: User,
-            attributes: { exclude: ["password"] },
+            attributes: ["id", "username", "email", "role", "imageUrl"],
           },
-          Category,
+          { model: Category, attributes: ["id", "name"] },
         ],
-        order: [["createdAt", "DESC"]],
       };
 
       if (search) {
-        paramsQuery.where = {
-          name: { [Op.iLike]: `%${search}%` },
-        };
+        options.where = { name: { [Op.iLike]: `%${search}%` } };
       }
 
-      let limit = 6;
-      let pageNumber = 1;
+      const cuisines = await Cuisine.findAndCountAll(options);
 
-      if (page) {
-        if (page.size) {
-          limit = +page.size;
-          paramsQuery.limit = limit;
-        }
-
-        if (page.number) {
-          pageNumber = +page.number;
-          paramsQuery.offset = limit * (pageNumber - 1);
-        }
-      }
-
-      const { count, rows } = await Cuisine.findAndCountAll(paramsQuery);
-      return res.json({
-        page: pageNumber,
-        data: rows,
-        totalData: count,
-        totalPage: Math.ceil(count / limit),
-        dataPerPage: limit,
+      console.log(`[SUCCESS] Retrieved ${cuisines.rows.length} cuisines`);
+      res.status(200).json({
+        totalItems: cuisines.count,
+        totalPages: Math.ceil(cuisines.count / pageSize),
+        currentPage: pageNumber,
+        data: cuisines.rows,
       });
     } catch (error) {
+      console.error("[ERROR] Failed to fetch cuisines:", error);
       next(error);
     }
   }
 
   static async getDetailCuisine(req, res, next) {
     try {
-      const { id } = req.params;
-      console.log(`🔍 Fetching cuisine ID: ${id}`);
-      const findCuisine = await Cuisine.findByPk(id);
+      console.log("[INFO] Fetching cuisine details");
+
+      const findCuisine = await Cuisine.findByPk(req.params.id, {
+        include: [
+          { model: User, attributes: ["id", "username", "email", "imageUrl"] },
+          { model: Category, attributes: ["id", "name"] },
+        ],
+      });
 
       if (!findCuisine) {
-        throw { name: "NotFound", message: "Cuisine not found" };
+        return res.status(404).json({ message: "Cuisine not found" });
       }
 
+      console.log(`[SUCCESS] Found cuisine '${findCuisine.name}'`);
       res.status(200).json(findCuisine);
     } catch (error) {
-      console.error("❌ Error in getDetailCuisine:", error);
+      console.error("[ERROR] Failed to fetch cuisine details:", error);
       next(error);
     }
   }
 
   static async editCuisine(req, res, next) {
     try {
-      const { name, description, price, CategoryId } = req.body;
+      console.log("[INFO] Editing cuisine");
+
       const { id } = req.params;
-      let option = {};
+      const { name, description, price, CategoryId } = req.body;
 
-      if (name || description || price || CategoryId) {
-        option = {
-          ...option,
-          name,
-          description,
-          price,
-          CategoryId,
-          UserId: req.user.id,
-        };
+      const cuisine = await Cuisine.findByPk(id);
+      if (!cuisine) {
+        return res.status(404).json({ message: "Cuisine not found" });
       }
 
-      if (req.file) {
-        try {
-          console.log("🚀 Uploading updated image...");
-          const b64File = Buffer.from(req.file.buffer).toString("base64");
-          const dataURI = `data:${req.file.mimetype};base64,${b64File}`;
+      const imgUrl = req.file ? await uploadImage(req.file) : cuisine.imgUrl;
+      const updatedData = {
+        name,
+        description,
+        price,
+        CategoryId,
+        UserId: req.user.id,
+        imgUrl,
+      };
 
-          const uploadResult = await cloudinary.uploader.upload(dataURI, {
-            folder: "delizioso-profile",
-            public_id: `${req.file.originalname.split(".")[0]}_${Date.now()}`,
-          });
-
-          option.imgUrl = uploadResult.secure_url;
-        } catch (uploadError) {
-          console.error("❌ Failed to upload new image:", uploadError);
-          throw { name: "BadRequest", message: "Failed to upload image" };
-        }
+      if (!name && !description && !price && !CategoryId && !req.file) {
+        return res.status(400).json({ message: "No changes provided" });
       }
 
-      await Cuisine.update(option, { where: { id } });
-      console.log("✅ Cuisine updated:", option);
+      await cuisine.update(updatedData);
 
-      res.status(200).json({ message: "Cuisine successfully updated" });
+      console.log(`[SUCCESS] Cuisine '${cuisine.name}' updated`);
+      res
+        .status(200)
+        .json({ message: "Cuisine successfully updated", cuisine });
     } catch (error) {
-      console.error("❌ Error in editCuisine:", error);
+      console.error("[ERROR] Failed to edit cuisine:", error);
       next(error);
     }
   }
 
   static async removeCuisine(req, res, next) {
     try {
-      const { id } = req.params;
-      await Cuisine.destroy({ where: { id } });
-      console.log(`🗑️ Cuisine ID ${id} deleted.`);
+      console.log("[INFO] Deleting cuisine");
 
+      const { id } = req.params;
+      const deleted = await Cuisine.destroy({ where: { id } });
+
+      if (!deleted) {
+        return res.status(404).json({ message: "Cuisine not found" });
+      }
+
+      console.log(`[SUCCESS] Cuisine ID ${id} deleted`);
       res.status(200).json({ message: "Cuisine successfully deleted" });
     } catch (error) {
-      console.error("❌ Error in removeCuisine:", error);
+      console.error("[ERROR] Failed to delete cuisine:", error);
       next(error);
     }
   }
