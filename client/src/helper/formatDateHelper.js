@@ -8,6 +8,6 @@ export const formatDate = (date) => {
     hour12: true,
   };
 
-  const formattedDate = new Intl.DateTimeFormat("id-ID", options).format(date);
+  const formattedDate = new Intl.DateTimeFormat("en-EN", options).format(date);
   return `${formattedDate}`;
 };
