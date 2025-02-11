@@ -1,5 +1,5 @@
-const { comparePass } = require("../helpers/bcryptjsHelper");
-const { signInToken } = require("../helpers/jwtHelper");
+const { comparePass } = require("../helpers/bcryptjs");
+const { signInToken } = require("../helpers/jsonwebtoken");
 const { User } = require("../models");
 const cloudinary = require("../config/cloudinary");
 
@@ -10,15 +10,14 @@ module.exports = class UserController {
 
       const { email, password } = req.body;
       if (!email?.trim() || !password?.trim()) {
-        throw {
-          name: "BadRequest",
-          message: "Email and Password are required",
-        };
+        return res
+          .status(400)
+          .json({ message: "Email and Password are required" });
       }
 
       const user = await User.findOne({ where: { email } });
       if (!user || !comparePass(password, user.password)) {
-        throw { name: "Unauthorized" };
+        return res.status(401).json({ message: "Invalid email or password" });
       }
 
       const access_token = signInToken({ id: user.id, role: user.role });
@@ -84,9 +83,8 @@ module.exports = class UserController {
       const { id } = req.user;
       const { username } = req.body;
 
-      let updates = {};
+      const updates = {};
       if (username?.trim()) {
-        console.log(`[INFO] Updating username: ${username}`);
         updates.username = username;
       }
 
@@ -103,49 +101,53 @@ module.exports = class UserController {
           "image/webp",
         ];
         if (!allowedFormats.includes(mimetype)) {
-          throw {
-            name: "BadRequest",
-            message: "Invalid file format. Use JPG, PNG, or WebP.",
-          };
+          return res
+            .status(400)
+            .json({ message: "Invalid file format. Use JPG, PNG, or WebP." });
         }
 
         const maxSize = 5 * 1024 * 1024; // 5MB
         if (size > maxSize) {
-          throw { name: "BadRequest", message: "File size exceeds 5MB limit." };
+          return res
+            .status(400)
+            .json({ message: "File size exceeds 5MB limit." });
         }
 
         console.log("[INFO] Uploading to Cloudinary...");
         const dataURI = `data:${mimetype};base64,${buffer.toString("base64")}`;
-        const uploadResult = await cloudinary.uploader.upload(dataURI, {
-          folder: "delizioso-profile",
-          public_id: `profile_${id}_${Date.now()}`,
-        });
+
+        let uploadResult;
+        try {
+          uploadResult = await cloudinary.uploader.upload(dataURI, {
+            folder: "delizioso-profile",
+            public_id: `profile_${id}_${Date.now()}`,
+          });
+        } catch (cloudinaryError) {
+          console.error("[ERROR] Cloudinary upload failed:", cloudinaryError);
+          return res
+            .status(500)
+            .json({ message: "Image upload failed. Please try again." });
+        }
 
         console.log(`[SUCCESS] Image uploaded: ${uploadResult.secure_url}`);
         updates.imageUrl = uploadResult.secure_url;
       }
 
       if (Object.keys(updates).length === 0) {
-        console.log("[INFO] No updates made");
         return res.status(400).json({ message: "No changes provided" });
       }
 
       console.log("[INFO] Updating user profile...");
-      const updatedUser = await User.findByPk(id);
-      if (!updatedUser) {
+      const [updated] = await User.update(updates, { where: { id } });
+      if (!updated) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      await updatedUser.update(updates);
       console.log(`[SUCCESS] User ID ${id} profile updated`);
 
       res.status(200).json({
         message: "Profile updated successfully",
-        user: {
-          id: updatedUser.id,
-          username: updatedUser.username,
-          imageUrl: updatedUser.imageUrl,
-        },
+        user: { id, ...updates },
       });
     } catch (error) {
       console.error("[ERROR] Failed to update profile:", error);
