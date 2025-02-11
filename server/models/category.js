@@ -1,27 +1,29 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Category extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      Category.hasMany(models.Cuisine);
+      Category.hasMany(models.Cuisine, { foreignKey: "CategoryId" });
     }
   }
+
   Category.init(
     {
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         allowNull: false,
+        unique: true,
         validate: {
-          notNull: {
-            msg: "Category is required",
+          notNull: { msg: "Category is required" },
+          notEmpty: { msg: "Category is required" },
+          len: {
+            args: [1, 100],
+            msg: "Category must be between 1 and 100 characters",
           },
-          notEmpty: {
-            msg: "Category is required",
+          is: {
+            args: [/^\S(.*\S)?$/], // allow only non-space characters
+            msg: "Category cannot be only spaces",
           },
         },
       },
@@ -29,7 +31,22 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Category",
+      timestamps: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["name"],
+        },
+      ],
+      hooks: {
+        beforeValidate: (category) => {
+          if (category.name) {
+            category.name = category.name.trim().toLowerCase();
+          }
+        },
+      },
     }
   );
+
   return Category;
 };
