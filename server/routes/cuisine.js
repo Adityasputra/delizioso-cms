@@ -1,5 +1,4 @@
 const express = require("express");
-const cacheMiddleware = require("../middlewares/redis");
 const {
   getAllCuisine,
   getDetailCuisine,
@@ -9,8 +8,8 @@ const {
 
 const router = express.Router();
 
-router.get("/", cacheMiddleware("cuisine-list", 300), getAllCuisine);
-router.get("/:id", cacheMiddleware("cuisine-detail", 300), getDetailCuisine);
+router.get("/", getAllCuisine);
+router.get("/:id/detail", getDetailCuisine);
 
 router.post("/", addCuisine);
 router.delete("/:id", removeCuisine);
