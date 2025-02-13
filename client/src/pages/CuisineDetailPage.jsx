@@ -7,29 +7,43 @@ import Button from "../components/ui/Button";
 
 export default function CuisineDetailPage() {
   const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDataCuisine = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        setError("Unauthorized: No access token found.");
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        const { data } = await axios.get(`/cuisines/${id}/detail`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.access_token}`,
-          },
+        const response = await axios.get(`/cuisines/${id}/detail`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        setData(data);
-      } catch (error) {
-        console.error("Failed to fetch cuisine details:", error);
+        setData(response.data);
+      } catch (err) {
+        setError("Failed to fetch cuisine details. Please try again later.");
+        console.error("❌ Fetch error:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchDataCuisine();
   }, [id]);
 
-  if (!data) {
+  if (isLoading) {
     return <p className="text-center text-gray-500">Loading...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500">{error}</p>;
   }
 
   return (
@@ -39,21 +53,21 @@ export default function CuisineDetailPage() {
         <div className="w-full p-6 md:flex md:items-center rounded-2xl md:bg-transparent md:p-0 lg:px-12 md:justify-between">
           <img
             className="h-24 w-24 md:mx-6 rounded-full object-cover shadow-md md:h-[32rem] md:w-80 lg:h-[36rem] lg:w-[26rem] md:rounded-2xl"
-            src={data?.imgUrl}
-            alt={data?.name}
+            src={data?.imgUrl || "/default-image.jpg"}
+            alt={data?.name || "Cuisine"}
           />
 
           <div className="mt-2 md:mx-6 flex-1">
             <div>
               <p className="text-4xl font-medium tracking-tight uppercase text-[#fffcf9]">
-                {data?.name}
+                {data?.name || "Unknown Cuisine"}
               </p>
               <p className="text-[#fffcf9] text-2xl mt-2">
-                {formatRupiah(data?.price)}
+                {formatRupiah(data?.price) || "Rp 0"}
               </p>
             </div>
             <p className="mt-4 text-lg leading-relaxed text-white md:text-xl">
-              {data?.description}
+              {data?.description || "No description available."}
             </p>
 
             <div className="flex justify-start mt-8">
@@ -62,7 +76,7 @@ export default function CuisineDetailPage() {
                 onClick={() => navigate("/")}
               >
                 <IoIosArrowBack className="h-5 w-5" />
-                back
+                Back
               </Button>
             </div>
           </div>
